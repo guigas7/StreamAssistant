@@ -1,0 +1,916 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FilesDialog</class>
+ <widget class="QDialog" name="FilesDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>563</width>
+    <height>502</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="QDialogButtonBox" name="DirectoriesDialogButtonBox">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>460</y>
+     <width>341</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
+   </property>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>12</y>
+     <width>541</width>
+     <height>441</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="AlphaTeamDirectoryLabel">
+        <property name="minimumSize">
+         <size>
+          <width>160</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>130</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Alpha Team Directory</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="AlphaTeamDirectoryEdit"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="AlphaTeamDirectoryFind">
+        <property name="minimumSize">
+         <size>
+          <width>41</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>41</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Find</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="AlphaTeamDirectoryHelp">
+        <property name="minimumSize">
+         <size>
+          <width>31</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>31</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>?</string>
+        </property>
+        <property name="default">
+         <bool>false</bool>
+        </property>
+        <property name="flat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_20">
+      <item>
+       <widget class="QLabel" name="BetaTeamDirectoryLabel">
+        <property name="minimumSize">
+         <size>
+          <width>160</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>102</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Beta Team Directory</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="BetaTeamDirectoryEdit"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="BetaTeamDirectoryFind">
+        <property name="minimumSize">
+         <size>
+          <width>41</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>41</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Find</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="BetaTeamDirectoryHelp">
+        <property name="minimumSize">
+         <size>
+          <width>31</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>31</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>?</string>
+        </property>
+        <property name="default">
+         <bool>false</bool>
+        </property>
+        <property name="flat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QLabel" name="RegionsDirectoryLabel">
+        <property name="minimumSize">
+         <size>
+          <width>160</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>102</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Regions Directory</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="RegionsDirectoryEdit"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="RegionsDirectoryFind">
+        <property name="minimumSize">
+         <size>
+          <width>41</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>41</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Find</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="RegionsDirectoryHelp">
+        <property name="minimumSize">
+         <size>
+          <width>31</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>31</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>?</string>
+        </property>
+        <property name="default">
+         <bool>false</bool>
+        </property>
+        <property name="flat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <widget class="QLabel" name="LogosDirectoryLabel">
+        <property name="minimumSize">
+         <size>
+          <width>160</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>102</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Logos Directory</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="LogosDirectoryEdit"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="LogosDirectoryFind">
+        <property name="minimumSize">
+         <size>
+          <width>41</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>41</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Find</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="LogosDirectoryHelp">
+        <property name="minimumSize">
+         <size>
+          <width>31</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>31</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>?</string>
+        </property>
+        <property name="default">
+         <bool>false</bool>
+        </property>
+        <property name="flat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <item>
+       <widget class="QLabel" name="MapsDirectoryLabel">
+        <property name="minimumSize">
+         <size>
+          <width>160</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>102</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Maps Directory</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="MapsDirectoryEdit"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="MapsDirectoryFind">
+        <property name="minimumSize">
+         <size>
+          <width>41</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>41</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Find</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="MapsDirectoryHelp">
+        <property name="minimumSize">
+         <size>
+          <width>31</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>31</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>?</string>
+        </property>
+        <property name="default">
+         <bool>false</bool>
+        </property>
+        <property name="flat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_6">
+      <item>
+       <widget class="QLabel" name="ModeIconsDirectoryLabel">
+        <property name="minimumSize">
+         <size>
+          <width>160</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>102</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Modes Icons Directory</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="ModeIconsDirectoryEdit"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="ModeIconsDirectoryFind">
+        <property name="minimumSize">
+         <size>
+          <width>41</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>41</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Find</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="ModeIconsDirectoryHelp">
+        <property name="minimumSize">
+         <size>
+          <width>31</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>31</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>?</string>
+        </property>
+        <property name="default">
+         <bool>false</bool>
+        </property>
+        <property name="flat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_10">
+      <item>
+       <widget class="QLabel" name="SplatfestColorsDirectoryLabel">
+        <property name="minimumSize">
+         <size>
+          <width>160</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>130</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Splatfest Colors Directory</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="SplatfestColorsDirectoryEdit"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="SplatfestColorsDirectoryFind">
+        <property name="minimumSize">
+         <size>
+          <width>41</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>41</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Find</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="SplatfestColorsDirectoryHelp">
+        <property name="minimumSize">
+         <size>
+          <width>31</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>31</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>?</string>
+        </property>
+        <property name="default">
+         <bool>false</bool>
+        </property>
+        <property name="flat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_9">
+      <item>
+       <widget class="QLabel" name="TurfWarColorsDirectoryLabel">
+        <property name="minimumSize">
+         <size>
+          <width>160</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>130</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Turf War Colors Directory</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="TurfWarColorsDirectoryEdit"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="TurfWarColorsDirectoryFind">
+        <property name="minimumSize">
+         <size>
+          <width>41</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>41</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Find</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="TurfWarColorsDirectoryHelp">
+        <property name="minimumSize">
+         <size>
+          <width>31</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>31</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>?</string>
+        </property>
+        <property name="default">
+         <bool>false</bool>
+        </property>
+        <property name="flat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_8">
+      <item>
+       <widget class="QLabel" name="RankedColorsDirectoryLabel">
+        <property name="minimumSize">
+         <size>
+          <width>160</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>130</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Ranked Colors Directory</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="RankedColorsDirectoryEdit"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="RankedColorsDirectoryFind">
+        <property name="minimumSize">
+         <size>
+          <width>41</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>41</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Find</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="RankedColorsDirectoryHelp">
+        <property name="minimumSize">
+         <size>
+          <width>31</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>31</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>?</string>
+        </property>
+        <property name="default">
+         <bool>false</bool>
+        </property>
+        <property name="flat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_21">
+      <item>
+       <widget class="QLabel" name="ImportingFilesDirectoryLabel">
+        <property name="minimumSize">
+         <size>
+          <width>160</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>102</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Importing Files Directory</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="ImportingFilesDirectoryEdit"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="ImportingFilesDirectoryFind">
+        <property name="minimumSize">
+         <size>
+          <width>41</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>41</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Find</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="ImportingFilesDirectoryHelp">
+        <property name="minimumSize">
+         <size>
+          <width>31</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>31</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>?</string>
+        </property>
+        <property name="default">
+         <bool>false</bool>
+        </property>
+        <property name="flat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_22">
+      <item>
+       <widget class="QLabel" name="DefaultDirectoryLabel">
+        <property name="minimumSize">
+         <size>
+          <width>160</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>102</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Default Directory</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="DefaultDirectoryEdit"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="DefaultDirectoryFind">
+        <property name="minimumSize">
+         <size>
+          <width>41</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>41</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Find</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="DefaultDirectoryHelp">
+        <property name="minimumSize">
+         <size>
+          <width>31</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>31</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>?</string>
+        </property>
+        <property name="default">
+         <bool>false</bool>
+        </property>
+        <property name="flat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>DirectoriesDialogButtonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>FilesDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>DirectoriesDialogButtonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>FilesDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
