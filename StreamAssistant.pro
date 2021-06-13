@@ -11,11 +11,13 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 SOURCES += \
     filesdialog.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    widget.cpp
 
 HEADERS += \
     filesdialog.h \
-    mainwindow.h
+    mainwindow.h \
+    widget.h
 
 FORMS += \
     filesdialog.ui \

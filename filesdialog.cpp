@@ -314,8 +314,3 @@ void FilesDialog::directories_init(QString *dirs)
     }
 
 }
-
-
-
-
-

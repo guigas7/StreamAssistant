@@ -14,18 +14,66 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     // init functions
-    this->configDirectories_init();
-    this->autoComplete_init();
-    this->infoSection_init();
-    this->TeamsSection_init();
-    this->RoundSection_init();
-    this->CastersSection_init();
-    this->SetSection_init();
+    qDebug() << ui->ColorsCombo->staticMetaObject.className();
+//    this->widgetsInit();
+//    this->configDirectories_init();
+//    this->autoComplete_init();
+//    this->infoSection_init();
+//    this->TeamsSection_init();
+//    this->RoundSection_init();
+//    this->CastersSection_init();
+//    this->SetSection_init();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::widgetsInit()
+{
+    QWidget *widgets[] = {
+        ui->Team1NameEdit, ui->Team1RegionCombo, ui->Team1Logo, ui->Team1Color, ui->Team1Score, ui->Team2NameEdit,
+        ui->Team2RegionCombo, ui->Team2Logo, ui->Team2Color, ui->Team2Score, ui->TitleEdit, ui->SubtitleEdit, ui->TwitterEdit,
+        ui->MessageEdit, ui->LogoCombo, ui->Caster1NameEdit, ui->Caster2NameEdit, ui->Caster3NameEdit, ui->Caster1TwitterEdit,
+        ui->Caster2TwitterEdit, ui->Caster3TwitterEdit, ui->RoundEdit, ui->ColorGroupCombo, ui->ColorsCombo,ui->AlphaWinRound1,
+        ui->AlphaWinRound2, ui->AlphaWinRound3, ui->AlphaWinRound4, ui->AlphaWinRound5, ui->AlphaWinRound6, ui->AlphaWinRound7,
+        ui->AlphaWinRound8, ui->AlphaWinRound9, ui->BetaWinRound1, ui->BetaWinRound2, ui->BetaWinRound3, ui->BetaWinRound4,
+        ui->BetaWinRound5, ui->BetaWinRound6, ui->BetaWinRound7, ui->BetaWinRound8, ui->BetaWinRound9, ui->CheckboxGame1,
+        ui->CheckboxGame2, ui->CheckboxGame3, ui->CheckboxGame4, ui->CheckboxGame5, ui->CheckboxGame6, ui->CheckboxGame7,
+        ui->CheckboxGame8, ui->CheckboxGame9, ui->MapComboRound1, ui->MapComboRound2, ui->MapComboRound3, ui->MapComboRound4,
+        ui->MapComboRound5, ui->MapComboRound6, ui->MapComboRound7, ui->MapComboRound8, ui->MapComboRound9, ui->ModeComboRound1,
+        ui->ModeComboRound2, ui->ModeComboRound3, ui->ModeComboRound4, ui->ModeComboRound5, ui->ModeComboRound6, ui->ModeComboRound7,
+        ui->ModeComboRound8, ui->ModeComboRound9
+    };
+    QString filenames[] = {
+        "name.txt", "region.txt", "logo", "color", "score.txt", "name.txt",
+        "region.txt", "logo", "color", "score.txt", "title.txt", "subtitle.txt", "twitter.txt",
+        "message.txt", "tournamentLogo", "1Name.txt", "2Name.txt", "3Name.txt", "1Twitter.txt",
+        "2Twitter.txt", "3Twitter.txt", "round.txt", "colorGroups.txt", "colors", "1",
+        "2", "3", "4", "5", "6", "7",
+        "8", "9", "1", "2", "3", "4",
+        "5", "6", "7", "8", "9", "currentGame.txt",
+        "currentGame.txt", "currentGame.txt", "currentGame.txt", "currentGame.txt", "currentGame.txt", "currentGame.txt",
+        "currentGame.txt", "currentGame.txt", "1", "2", "3", "4",
+        "5", "6", "7", "8", "9", "1",
+        "2", "3", "4", "5", "6", "7",
+        "8", "9",
+    };
+    QString importDirs[] = {
+        "teamAlpha", "teamAlpha", "teamAlpha", "teamAlpha", "teamAlpha", "teamBeta",
+        "teamBeta", "teamBeta", "teamBeta", "teamBeta", "info", "info", "info",
+        "info", "info", "casters", "casters", "casters", "casters",
+        "casters", "casters", "round", "round", "round", "set/winners",
+        "set/winners", "set/winners", "set/winners", "set/winners", "set/winners", "set/winners",
+        "set/winners", "set/winners", "set/winners", "set/winners", "set/winners", "set/winners",
+        "set/winners", "set/winners", "set/winners", "set/winners", "set/winners", "set",
+        "set", "set", "set", "set", "set", "set",
+        "set", "set", "set/maps", "set/maps", "set/maps", "set/maps",
+        "set/maps", "set/maps", "set/maps", "set/maps", "set/maps", "set/modes",
+        "set/modes", "set/modes", "set/modes", "set/modes", "set/modes", "set/modes",
+        "set/modes", "set/modes",
+    };
 }
 
 // Serialization functions
@@ -97,10 +145,16 @@ QStringList MainWindow::getListOf(QString dirString)
 
 void MainWindow::autoComplete_init()
 {
-    QStringList teamCompletionList = this->getListOf(this->directoryFor["/AlphaTeamDirectory.txt"]);
-    TeamCompleter = new QCompleter(teamCompletionList, this);
-    TeamCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-    ui->Team1NameEdit->setCompleter(TeamCompleter);
+    // Set TeamAlpha Autocomplete
+    QStringList team1CompletionList = this->getListOf(this->directoryFor["/AlphaTeamDirectory.txt"]);
+    Team1Completer = new QCompleter(team1CompletionList, this);
+    Team1Completer->setCaseSensitivity(Qt::CaseInsensitive);
+    ui->Team1NameEdit->setCompleter(Team1Completer);
+    // Set TeamBeta Autocomplete
+    QStringList team2completionList = this->getListOf(this->directoryFor["/BetaTeamDirectory.txt"]);
+    Team2Completer = new QCompleter(team2completionList, this);
+    Team2Completer->setCaseSensitivity(Qt::CaseInsensitive);
+    ui->Team1NameEdit->setCompleter(Team2Completer);
 }
 
 void MainWindow::infoSection_init()
@@ -249,7 +303,6 @@ void MainWindow::on_Team1NameEdit_editingFinished()
     } else {
         qDebug() << "couldn't load image";
     }
-
 }
 
 /*
