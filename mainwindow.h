@@ -5,7 +5,10 @@
 #include <QMap>
 #include <QCompleter>
 #include "filesdialog.h"
-#include "widget.h"
+#include "mywidget.h"
+#include "lineeditwidget.h"
+
+#define widAmount 69
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -53,7 +56,7 @@ private:
     void RoundSection_init();
     void CastersSection_init();
     void SetSection_init();
-    void widgetsInit();
+    QMap<QString, MyWidget*> widgets_init();
     QStringList getListOf(QString dirIndex);
     void writeInFile(QString filename, QString text);
     void serialize(const char *, void *, int);
@@ -62,7 +65,7 @@ private:
     QCompleter *Team2Completer;
     QCompleter *MapCompleter;
     QMap<QString, QString> directoryFor;
-    QMap<QWidget, Widget> widgetFor;
+    QMap<QString, MyWidget *> widgetFor;
     QString directories[dirAmount];
 };
 
