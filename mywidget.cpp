@@ -8,12 +8,13 @@ MyWidget::MyWidget(QString sec, QString fts)
 
 Qtype MyWidget::convertType(QString typ)
 {
-    if (QString::compare(typ, "QLINEEDIT", Qt::CaseInsensitive)) return QLINEEDIT;
+    if (QString::compare(typ, "QLineEdit", Qt::CaseInsensitive)) return QLINEEDIT;
     else if (QString::compare(typ, "QLabel", Qt::CaseInsensitive)) return QLABEL;
     else if (QString::compare(typ, "QComboBox", Qt::CaseInsensitive)) return QCOMBOBOX;
     else if (QString::compare(typ, "QSpinBox", Qt::CaseInsensitive)) return QSPINBOX;
     else if (QString::compare(typ, "QCheckBox", Qt::CaseInsensitive)) return QCHECKBOX;
     else if (QString::compare(typ, "QRadioButton", Qt::CaseInsensitive)) return QRADIOBUTTON;
+    else if (QString::compare(typ, "QPlainTextEdit", Qt::CaseInsensitive)) return QPLAINTEXTEDIT;
     return QLINEEDIT;
 }
 
@@ -50,14 +51,44 @@ void MyWidget::writeInFile(QString filename, QString text)
     }
 }
 
-void MyWidget::init(QString importingDir, QWidget *wid)
+QString MyWidget::findImageWithExtension(QString filename)
 {
-    qDebug() << "Got in the base class init";
+    if (QFile::exists(filename + ".png")) {
+        return filename + ".png";
+    } else if (QFile::exists(filename + ".jpg")) {
+        return filename + ".jpg";
+    } else if (QFile::exists(filename)) {
+        return filename;
+    }
+    qDebug() << filename + " not found!";
+    return "";
+}
+
+void MyWidget::copyFile(QString source, QString destiny)
+{
+    QFile::remove(destiny);
+    QFile::copy(source, destiny);
     return;
 }
 
-void MyWidget::saveInFile(QString importingDir, QWidget *wid)
+MyWidget::~MyWidget()
 {
-    qDebug() << "Got in the base class saveInFile";
     return;
 }
+
+QString MyWidget::getRandomImageName(QString defaultDir)
+{
+    QDir directory(defaultDir + "/" + this->getFileToSave());
+    QStringList imagesList = directory.entryList(QDir::Files);
+    int max = imagesList.size();
+    QRandomGenerator::global()->generate();
+    if (max > 0) {
+        int picked = QRandomGenerator::global()->bounded(max);
+        if (picked > -1) {
+            return defaultDir + "/" + getFileToSave() + "/" + imagesList.at(picked);
+        }
+    }
+    return "Nenhuma imagem padrão para escolher";
+}
+
+

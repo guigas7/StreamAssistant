@@ -16,7 +16,6 @@ MainWindow::MainWindow(QWidget *parent)
     // init functions
     this->widgetFor = this->widgets_init();
     this->configDirectories_init();
-    this->autoComplete_init();
     this->infoSection_init();
     this->TeamsSection_init();
     this->RoundSection_init();
@@ -29,6 +28,12 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::on_actionSet_Directories_triggered()
+{
+    dirConfigWindow = new FilesDialog(this, &this->directoryFor, this->directories);
+    dirConfigWindow->show();
+    this->configDirectories_init();
+}
 
 // Serialization functions
 
@@ -61,8 +66,7 @@ void MainWindow::configDirectories_init()
     for (int i = 0; i < dirAmount; i++) {
         this->directories[i] = dirs[i];
     }
-    QString directory = QDir::currentPath();
-    directory.append("/config");
+    QString directory = QDir::currentPath() + "/config";
     QString filename;
     QFile file;
     QDir dir;
@@ -97,123 +101,259 @@ QStringList MainWindow::getListOf(QString dirString)
     return noExtensionList;
 }
 
-void MainWindow::autoComplete_init()
+
+void MainWindow::scoreAutoUpdate(QSpinBox *teamScore, QCheckBox *teamCheckBox)
 {
-    // Set TeamAlpha Autocomplete
-    QStringList team1CompletionList = this->getListOf(this->directoryFor["/AlphaTeamDirectory.txt"]);
-    Team1Completer = new QCompleter(team1CompletionList, this);
-    Team1Completer->setCaseSensitivity(Qt::CaseInsensitive);
-    ui->Team1NameEdit->setCompleter(Team1Completer);
-    // Set TeamBeta Autocomplete
-    QStringList team2completionList = this->getListOf(this->directoryFor["/BetaTeamDirectory.txt"]);
-    Team2Completer = new QCompleter(team2completionList, this);
-    Team2Completer->setCaseSensitivity(Qt::CaseInsensitive);
-    ui->Team1NameEdit->setCompleter(Team2Completer);
+    if (ui->UpdateScoreCheckbox->isChecked()) {
+        int score = teamScore->value();
+        if (teamCheckBox->isChecked()) {
+            teamScore->setValue(score + 1);
+        } else {
+            teamScore->setValue(score == 0 ? 0 : score - 1);
+        }
+    }
 }
 
 void MainWindow::infoSection_init()
 {
     // Logo Combo
-    const QStringList logosList = this->getListOf(this->directoryFor["/LogosDirectory.txt"]);
-    ui->LogoCombo->addItems(logosList);
-    // Other Fields
-    LineEditWidget *lin {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->TitleEdit->objectName()])};
-    lin->init(this->directoryFor["/ImportingFilesDirectory.txt"], ui->TitleEdit);
+    ComboBoxWidget *logoCombo {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->LogoCombo->objectName()])};
+    logoCombo->init(this->directoryFor["/ImportingFilesDirectory.txt"], ui->LogoCombo, this->directoryFor["/LogosDirectory.txt"]);
+    // Title
+    LineEditWidget *title {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->TitleEdit->objectName()])};
+    title->init(this->directoryFor["/ImportingFilesDirectory.txt"], ui->TitleEdit);
+    // Subtitle
+    LineEditWidget *subtitle {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->SubtitleEdit->objectName()])};
+    subtitle->init(this->directoryFor["/ImportingFilesDirectory.txt"], ui->SubtitleEdit);
+    // Twitter
+    LineEditWidget *twitter {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->TwitterEdit->objectName()])};
+    twitter->init(this->directoryFor["/ImportingFilesDirectory.txt"], ui->TwitterEdit);
+    // Message
+    PlainTextWidget *message {dynamic_cast<PlainTextWidget *>(this->widgetFor[ui->MessageEdit->objectName()])};
+    message->init(this->directoryFor["/ImportingFilesDirectory.txt"], ui->MessageEdit);
 }
 
 void MainWindow::TeamsSection_init()
 {
-    // Regions Combo
-    const QStringList RegionsList = this->getListOf(this->directoryFor["/RegionsDirectory.txt"]);
-    ui->Team1RegionCombo->addItems(RegionsList);
-    ui->Team2RegionCombo->addItems(RegionsList);
+    QString importDir = this->directoryFor["/ImportingFilesDirectory.txt"];
+    QString defaultDir = this->directoryFor["/DefaultDirectory.txt"];
+    // Team Alpha
+    QString alphaDir = this->directoryFor["/AlphaTeamDirectory.txt"];
+    LineEditWidget *alphaName {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Team1NameEdit->objectName()])};
+    LabelWidget *alphaLogo {dynamic_cast<LabelWidget *>(this->widgetFor[ui->Team1Logo->objectName()])};
+    SpinBoxWidget *alphaScore {dynamic_cast<SpinBoxWidget *>(this->widgetFor[ui->Team1Score->objectName()])};
+    // Set Team Alpha Autocomplete
+    QStringList team1CompletionList = this->getListOf(alphaDir);
+    this->Team1Completer = new QCompleter(team1CompletionList, this);
+    this->Team1Completer->setCaseSensitivity(Qt::CaseInsensitive);
+    this->Team1Completer->setFilterMode(Qt::MatchContains);
+    ui->Team1NameEdit->setCompleter(this->Team1Completer);
+    // Team Alpha Name
+    alphaName->init(importDir, ui->Team1NameEdit);
+    // Team Alpha Logo
+    alphaLogo->init(importDir, ui->Team1Logo, alphaDir + "/" + ui->Team1NameEdit->text(), defaultDir);
+    // Team Alpha Score
+    alphaScore->init(importDir, ui->Team1Score);
+    // Team Alpha Region
+    ComboBoxWidget *alphaRegion {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->Team1RegionCombo->objectName()])};
+    alphaRegion->init(importDir, ui->Team1RegionCombo, this->directoryFor["/RegionsDirectory.txt"]);
+
+    // Team Beta
+    QString betaDir = this->directoryFor["/BetaTeamDirectory.txt"];
+    LineEditWidget *betaName {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Team2NameEdit->objectName()])};
+    LabelWidget *betaLogo {dynamic_cast<LabelWidget *>(this->widgetFor[ui->Team2Logo->objectName()])};
+    SpinBoxWidget *betaScore {dynamic_cast<SpinBoxWidget *>(this->widgetFor[ui->Team2Score->objectName()])};
+    // Set Team Beta Autocomplete
+    QStringList team2CompletionList = this->getListOf(betaDir);
+    this->Team2Completer = new QCompleter(team2CompletionList, this);
+    this->Team2Completer->setCaseSensitivity(Qt::CaseInsensitive);
+    this->Team2Completer->setFilterMode(Qt::MatchContains);
+    ui->Team2NameEdit->setCompleter(this->Team2Completer);
+    // Team Beta Name
+    betaName->init(importDir, ui->Team2NameEdit);
+    // Team Beta Logo
+    betaLogo->init(importDir, ui->Team2Logo, betaDir + "/" + ui->Team2NameEdit->text(), defaultDir);
+    // Team Beta Score
+    betaScore->init(importDir, ui->Team2Score);
+    // Team Beta Region
+    ComboBoxWidget *betaRegion {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->Team2RegionCombo->objectName()])};
+    betaRegion->init(importDir, ui->Team2RegionCombo, this->directoryFor["/RegionsDirectory.txt"]);
 }
 
 void MainWindow::RoundSection_init()
-{
+{ 
+    QString importDir = this->directoryFor["/ImportingFilesDirectory.txt"];
     // Color Group Combo
-    const QStringList ColorGroupsList = {"Ranked", "Turf War", "Spletfest"};
-    ui->ColorGroupCombo->addItems(ColorGroupsList);
+    const QStringList colorGroupsList = {"Ranked", "Turf War", "Splatfest"};
+    ComboBoxWidget *colorGroup {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->ColorGroupCombo->objectName()])};
+    colorGroup->init(importDir, ui->ColorGroupCombo, colorGroupsList);
     // Colors Combo
     QStringList colorsList;
     QString comboString;
     QString indivString;
+    QDir comboDir;
+    QDir indivDir;
     if (ui->ColorGroupCombo->currentData().toString() == "Ranked") {
         // Check if combo or individual
         comboString = this->directoryFor["/RankedColorsDirectory.txt"] + "/combo";
         indivString = this->directoryFor["/RankedColorsDirectory.txt"] + "/alpha";
-        QDir comboDir(comboString);
-        QDir indivDir(indivString);
-        if (comboDir.exists() && !comboDir.isEmpty()) {
-            colorsList = this->getListOf(comboString);
-        } else if (indivDir.exists() && !indivDir.isEmpty()) {
-            colorsList = this->getListOf(indivString);
-        }
     } else if (ui->ColorGroupCombo->currentData().toString() == "Turf War") {
         // Check if combo or individual
         comboString = this->directoryFor["/TurfWarColorsDirectory.txt"] + "/combo";
         indivString = this->directoryFor["/TurfWarColorsDirectory.txt"] + "/alpha";
-        QDir comboDir(comboString);
-        QDir indivDir(indivString);
-        if (comboDir.exists() && !comboDir.isEmpty()) {
-            colorsList = this->getListOf(comboString);
-        } else if (indivDir.exists() && !indivDir.isEmpty()) {
-            colorsList = this->getListOf(indivString);
-        }
     } else { // Splatfest
         // Check if combo or individual
         comboString = this->directoryFor["/SplatfestColorsDirectory.txt"] + "/combo";
         indivString = this->directoryFor["/SplatfestColorsDirectory.txt"] + "/alpha";
-        QDir comboDir(comboString);
-        QDir indivDir(indivString);
-        if (comboDir.exists() && !comboDir.isEmpty()) {
-            colorsList = this->getListOf(comboString);
-        } else if (indivDir.exists() && !indivDir.isEmpty()) {
-            colorsList = this->getListOf(indivString);
-        }
+    }
+    comboDir.setPath(comboString);
+    indivDir.setPath(indivString);
+    if (comboDir.exists() && !comboDir.isEmpty()) {
+        colorsList = this->getListOf(comboString);
+    } else if (indivDir.exists() && !indivDir.isEmpty()) {
+        colorsList = this->getListOf(indivString);
     }
     ui->ColorsCombo->addItems(colorsList);
+    // Round
+    LineEditWidget *round {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->RoundEdit->objectName()])};
+    round->init(importDir, ui->RoundEdit);
 }
 
 void MainWindow::CastersSection_init()
 {
-    QFile file;
-    QString directory = this->directoryFor["/ImportingFilesDirectory.txt"] + "/casters";
-    QString text;
-    QLineEdit *casterFields[6] = {
-        ui->Caster1NameEdit, ui->Caster2NameEdit, ui->Caster3NameEdit,
-        ui->Caster1TwitterEdit, ui->Caster2TwitterEdit, ui->Caster3TwitterEdit
-    };
-    QString filenames[6] = {
-        "/1Name.txt", "/2Name.txt", "/3Name.txt",
-        "/1Twitter.txt", "/2Twitter.txt", "/3Twitter.txt"
-    };
-    for (int i = 0;i < 6; i++) {
-        file.setFileName(directory + filenames[i]);
-        if (file.open(QFile::ReadOnly | QFile::Text)) {
-            QTextStream in(&file);
-            text = in.readAll();
-            casterFields[i]->setText(text);
-        }
-        file.close();
-    }
+    // Caster 1 Name
+    LineEditWidget *caster1Name {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Caster1NameEdit->objectName()])};
+    caster1Name->init(this->directoryFor["/ImportingFilesDirectory.txt"], ui->Caster1NameEdit);
+    // Caster 2 Name
+    LineEditWidget *caster2Name {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Caster2NameEdit->objectName()])};
+    caster2Name->init(this->directoryFor["/ImportingFilesDirectory.txt"], ui->Caster2NameEdit);
+    // Caster 3 Name
+    LineEditWidget *caster3Name {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Caster3NameEdit->objectName()])};
+    caster3Name->init(this->directoryFor["/ImportingFilesDirectory.txt"], ui->Caster3NameEdit);
+    // Caster 1 Twitter
+    LineEditWidget *caster1Twitter {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Caster1TwitterEdit->objectName()])};
+    caster1Twitter->init(this->directoryFor["/ImportingFilesDirectory.txt"], ui->Caster1TwitterEdit);
+    // Caster 2 Twitter
+    LineEditWidget *caster2Twitter {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Caster2TwitterEdit->objectName()])};
+    caster2Twitter->init(this->directoryFor["/ImportingFilesDirectory.txt"], ui->Caster2TwitterEdit);
+    // Caster 3 Twitter
+    LineEditWidget *caster3Twitter {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Caster3TwitterEdit->objectName()])};
+    caster3Twitter->init(this->directoryFor["/ImportingFilesDirectory.txt"], ui->Caster3TwitterEdit);
 }
 
 void MainWindow::SetSection_init()
 {
-    // Regions Combo
-    QComboBox *modeCombos[9] = {
-        ui->ModeComboRound1, ui->ModeComboRound2, ui->ModeComboRound3,
-        ui->ModeComboRound4, ui->ModeComboRound5, ui->ModeComboRound6,
-        ui->ModeComboRound7, ui->ModeComboRound8, ui->ModeComboRound9
-    };
-    const QStringList ModesList = this->getListOf(this->directoryFor["/ModeIconsDirectory.txt"]);
-    for (int i = 0;i < 9; i++) {
-        modeCombos[i]->addItems(ModesList);
-    }
+    QString importDir = this->directoryFor["/ImportingFilesDirectory.txt"];
+    // Mode combos
+    ComboBoxWidget *modeGame1 {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->ModeComboGame1->objectName()])};
+    modeGame1->init(importDir, ui->ModeComboGame1, this->directoryFor["/ModeIconsDirectory.txt"]);
+    ComboBoxWidget *modeGame2 {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->ModeComboGame2->objectName()])};
+    modeGame2->init(importDir, ui->ModeComboGame2, this->directoryFor["/ModeIconsDirectory.txt"]);
+    ComboBoxWidget *modeGame3 {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->ModeComboGame3->objectName()])};
+    modeGame3->init(importDir, ui->ModeComboGame3, this->directoryFor["/ModeIconsDirectory.txt"]);
+    ComboBoxWidget *modeGame4 {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->ModeComboGame4->objectName()])};
+    modeGame4->init(importDir, ui->ModeComboGame4, this->directoryFor["/ModeIconsDirectory.txt"]);
+    ComboBoxWidget *modeGame5 {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->ModeComboGame5->objectName()])};
+    modeGame5->init(importDir, ui->ModeComboGame5, this->directoryFor["/ModeIconsDirectory.txt"]);
+    ComboBoxWidget *modeGame6 {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->ModeComboGame6->objectName()])};
+    modeGame6->init(importDir, ui->ModeComboGame6, this->directoryFor["/ModeIconsDirectory.txt"]);
+    ComboBoxWidget *modeGame7 {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->ModeComboGame7->objectName()])};
+    modeGame7->init(importDir, ui->ModeComboGame7, this->directoryFor["/ModeIconsDirectory.txt"]);
+    ComboBoxWidget *modeGame8 {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->ModeComboGame8->objectName()])};
+    modeGame8->init(importDir, ui->ModeComboGame8, this->directoryFor["/ModeIconsDirectory.txt"]);
+    ComboBoxWidget *modeGame9 {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->ModeComboGame9->objectName()])};
+    modeGame9->init(importDir, ui->ModeComboGame9, this->directoryFor["/ModeIconsDirectory.txt"]);
+    // Map Combos
+    QString mapsDir = this->directoryFor["/MapsDirectory.txt"];
+    QStringList map1CompletionList = this->getListOf(mapsDir);
+    this->MapCompleter = new QCompleter(map1CompletionList, this);
+    this->MapCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    this->MapCompleter->setFilterMode(Qt::MatchContains);
+    ui->MapComboGame1->setCompleter(this->MapCompleter);
+    LineEditWidget *mapName1 {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->MapComboGame1->objectName()])};
+    mapName1->init(importDir, ui->MapComboGame1, ".txt");
+    ui->MapComboGame2->setCompleter(this->MapCompleter);
+    LineEditWidget *mapName2 {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->MapComboGame2->objectName()])};
+    mapName2->init(importDir, ui->MapComboGame2, ".txt");
+    ui->MapComboGame3->setCompleter(this->MapCompleter);
+    LineEditWidget *mapName3 {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->MapComboGame3->objectName()])};
+    mapName3->init(importDir, ui->MapComboGame3, ".txt");
+    ui->MapComboGame4->setCompleter(this->MapCompleter);
+    LineEditWidget *mapName4 {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->MapComboGame4->objectName()])};
+    mapName4->init(importDir, ui->MapComboGame4, ".txt");
+    ui->MapComboGame5->setCompleter(this->MapCompleter);
+    LineEditWidget *mapName5 {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->MapComboGame5->objectName()])};
+    mapName5->init(importDir, ui->MapComboGame5, ".txt");
+    ui->MapComboGame6->setCompleter(this->MapCompleter);
+    LineEditWidget *mapName6 {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->MapComboGame6->objectName()])};
+    mapName6->init(importDir, ui->MapComboGame6, ".txt");
+    ui->MapComboGame7->setCompleter(this->MapCompleter);
+    LineEditWidget *mapName7 {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->MapComboGame7->objectName()])};
+    mapName7->init(importDir, ui->MapComboGame7, ".txt");
+    ui->MapComboGame8->setCompleter(this->MapCompleter);
+    LineEditWidget *mapName8 {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->MapComboGame8->objectName()])};
+    mapName8->init(importDir, ui->MapComboGame8, ".txt");
+    ui->MapComboGame9->setCompleter(this->MapCompleter);
+    LineEditWidget *mapName9 {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->MapComboGame9->objectName()])};
+    mapName9->init(importDir, ui->MapComboGame9, ".txt");
+    // Game Radio Buttons
+    RadioButtonWidget *game1 {dynamic_cast<RadioButtonWidget *>(this->widgetFor[ui->RadioGame1->objectName()])};
+    game1->init(importDir, ui->RadioGame1, "1");
+    RadioButtonWidget *game2 {dynamic_cast<RadioButtonWidget *>(this->widgetFor[ui->RadioGame2->objectName()])};
+    game2->init(importDir, ui->RadioGame2, "2");
+    RadioButtonWidget *game3 {dynamic_cast<RadioButtonWidget *>(this->widgetFor[ui->RadioGame3->objectName()])};
+    game3->init(importDir, ui->RadioGame3, "3");
+    RadioButtonWidget *game4 {dynamic_cast<RadioButtonWidget *>(this->widgetFor[ui->RadioGame4->objectName()])};
+    game4->init(importDir, ui->RadioGame4, "4");
+    RadioButtonWidget *game5 {dynamic_cast<RadioButtonWidget *>(this->widgetFor[ui->RadioGame5->objectName()])};
+    game5->init(importDir, ui->RadioGame5, "5");
+    RadioButtonWidget *game6 {dynamic_cast<RadioButtonWidget *>(this->widgetFor[ui->RadioGame6->objectName()])};
+    game6->init(importDir, ui->RadioGame6, "6");
+    RadioButtonWidget *game7 {dynamic_cast<RadioButtonWidget *>(this->widgetFor[ui->RadioGame7->objectName()])};
+    game7->init(importDir, ui->RadioGame7, "7");
+    RadioButtonWidget *game8 {dynamic_cast<RadioButtonWidget *>(this->widgetFor[ui->RadioGame8->objectName()])};
+    game8->init(importDir, ui->RadioGame8, "8");
+    RadioButtonWidget *game9 {dynamic_cast<RadioButtonWidget *>(this->widgetFor[ui->RadioGame9->objectName()])};
+    game9->init(importDir, ui->RadioGame9, "9");
+    // alpha Game Winner Checkboxes
+    CheckBoxWidget *alphaWin1 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame1->objectName()])};
+    alphaWin1->init(importDir, ui->AlphaWinGame1, ui->Team1NameEdit->text());
+    CheckBoxWidget *alphaWin2 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame2->objectName()])};
+    alphaWin2->init(importDir, ui->AlphaWinGame2, ui->Team1NameEdit->text());
+    CheckBoxWidget *alphaWin3 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame3->objectName()])};
+    alphaWin3->init(importDir, ui->AlphaWinGame3, ui->Team1NameEdit->text());
+    CheckBoxWidget *alphaWin4 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame4->objectName()])};
+    alphaWin4->init(importDir, ui->AlphaWinGame4, ui->Team1NameEdit->text());
+    CheckBoxWidget *alphaWin5 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame5->objectName()])};
+    alphaWin5->init(importDir, ui->AlphaWinGame5, ui->Team1NameEdit->text());
+    CheckBoxWidget *alphaWin6 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame6->objectName()])};
+    alphaWin6->init(importDir, ui->AlphaWinGame6, ui->Team1NameEdit->text());
+    CheckBoxWidget *alphaWin7 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame7->objectName()])};
+    alphaWin7->init(importDir, ui->AlphaWinGame7, ui->Team1NameEdit->text());
+    CheckBoxWidget *alphaWin8 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame8->objectName()])};
+    alphaWin8->init(importDir, ui->AlphaWinGame8, ui->Team1NameEdit->text());
+    CheckBoxWidget *alphaWin9 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame9->objectName()])};
+    alphaWin9->init(importDir, ui->AlphaWinGame9, ui->Team1NameEdit->text());
+    // Beta Game Winner Checkboxes
+    CheckBoxWidget *betaWin1 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame1->objectName()])};
+    betaWin1->init(importDir, ui->BetaWinGame1, ui->Team2NameEdit->text());
+    CheckBoxWidget *betaWin2 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame2->objectName()])};
+    betaWin2->init(importDir, ui->BetaWinGame2, ui->Team2NameEdit->text());
+    CheckBoxWidget *betaWin3 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame3->objectName()])};
+    betaWin3->init(importDir, ui->BetaWinGame3, ui->Team2NameEdit->text());
+    CheckBoxWidget *betaWin4 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame4->objectName()])};
+    betaWin4->init(importDir, ui->BetaWinGame4, ui->Team2NameEdit->text());
+    CheckBoxWidget *betaWin5 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame5->objectName()])};
+    betaWin5->init(importDir, ui->BetaWinGame5, ui->Team2NameEdit->text());
+    CheckBoxWidget *betaWin6 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame6->objectName()])};
+    betaWin6->init(importDir, ui->BetaWinGame6, ui->Team2NameEdit->text());
+    CheckBoxWidget *betaWin7 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame7->objectName()])};
+    betaWin7->init(importDir, ui->BetaWinGame7, ui->Team2NameEdit->text());
+    CheckBoxWidget *betaWin8 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame8->objectName()])};
+    betaWin8->init(importDir, ui->BetaWinGame8, ui->Team2NameEdit->text());
+    CheckBoxWidget *betaWin9 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame9->objectName()])};
+    betaWin9->init(importDir, ui->BetaWinGame9, ui->Team2NameEdit->text());
 }
-
-// qDebug() << "debug text"
 
 void MainWindow::writeInFile(QString filename, QString text)
 {
@@ -234,32 +374,21 @@ void MainWindow::writeInFile(QString filename, QString text)
 
 void MainWindow::on_Team1NameEdit_editingFinished()
 {
-    // Set text right
-    QString filename = this->directoryFor["/ImportingFilesDirectory.txt"] + "/teamAlpha/name.txt";
-    this->writeInFile(filename, ui->Team1NameEdit->text());
-    QString imageName = this->directoryFor["/AlphaTeamDirectory.txt"] + "/" + ui->Team1NameEdit->text();
-    QString copyName = this->directoryFor["/ImportingFilesDirectory.txt"] + "/teamAlpha/logo";
-    // Find correct extension
-    if (QFile::exists(imageName + ".png")) {
-        imageName.append(".png");
-    } else if ((QFile::exists(imageName + ".jpg"))) {
-        imageName.append(".jpg");
-    } else {
-        qDebug() << imageName + " not found!";
-        // get random pic
-        return;
-    }
-    // Copy team logo to file
-    QFile::copy(imageName, copyName);
-    // Show team logo on screen
-    QImage image;
-    bool valid = image.load(imageName);
-    if (valid) {
-        image = image.scaled(ui->Team1Logo->width(), ui->Team1Logo->height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        ui->Team1Logo->setPixmap(QPixmap::fromImage(image));
-    } else {
-        qDebug() << "couldn't load image";
-    }
+    QString importDir = this->directoryFor["/ImportingFilesDirectory.txt"];
+    QString defaultDir = this->directoryFor["/DefaultDirectory.txt"];
+    QString alphaDir = this->directoryFor["/AlphaTeamDirectory.txt"];
+    LineEditWidget *name {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Team1NameEdit->objectName()])};
+    LabelWidget *logo {dynamic_cast<LabelWidget *>(this->widgetFor[ui->Team1Logo->objectName()])};
+
+    name->saveInFile(importDir, ui->Team1NameEdit);
+    logo->init(importDir, ui->Team1Logo, alphaDir + "/" + ui->Team1NameEdit->text(), defaultDir);
+}
+
+void MainWindow::on_Team1RegionCombo_activated(int index)
+{
+    QString local = this->directoryFor["/RegionsDirectory.txt"];
+    ComboBoxWidget *regionsCombo {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->Team1RegionCombo->objectName()])};
+    regionsCombo->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->Team1RegionCombo, "no image", local);
 }
 
 /*
@@ -267,26 +396,124 @@ void MainWindow::on_Team1NameEdit_editingFinished()
 */
 
 /*
-/ Round Section
-*/
-
-/*
-/ END Round Section
-*/
-
-void MainWindow::on_SetDirectoriesButton_clicked()
-{
-    dirConfigWindow = new FilesDialog(this, &this->directoryFor, this->directories);
-    dirConfigWindow->show();
-    this->configDirectories_init();
-}
-
-/*
 / Team Beta Section
 */
 
+void MainWindow::on_Team2NameEdit_editingFinished()
+{
+    QString importDir = this->directoryFor["/ImportingFilesDirectory.txt"];
+    QString defaultDir = this->directoryFor["/DefaultDirectory.txt"];
+    QString betaDir = this->directoryFor["/BetaTeamDirectory.txt"];
+    LineEditWidget *name {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Team2NameEdit->objectName()])};
+    LabelWidget *logo {dynamic_cast<LabelWidget *>(this->widgetFor[ui->Team2Logo->objectName()])};
+
+    name->saveInFile(importDir, ui->Team2NameEdit);
+    logo->init(importDir, ui->Team2Logo, betaDir + "/" + ui->Team2NameEdit->text(), defaultDir);
+}
+
+void MainWindow::on_Team2RegionCombo_activated(int index)
+{
+    QString local = this->directoryFor["/RegionsDirectory.txt"];
+    ComboBoxWidget *regionsCombo {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->Team2RegionCombo->objectName()])};
+    regionsCombo->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->Team2RegionCombo, "no image", local);
+}
+
 /*
 / END Team Beta Section
+*/
+
+/*
+/ Round Section
+*/
+
+void MainWindow::on_RoundEdit_editingFinished()
+{
+    LineEditWidget *round {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->RoundEdit->objectName()])};
+    round->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->RoundEdit);
+}
+
+void MainWindow::on_ColorGroupCombo_activated(int index)
+{
+    ComboBoxWidget *colorGroupCombo {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->ColorGroupCombo->objectName()])};
+    colorGroupCombo->saveContentInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->ColorGroupCombo);
+}
+
+
+void MainWindow::on_Team1Score_textChanged(const QString &arg1)
+{
+    SpinBoxWidget *score {dynamic_cast<SpinBoxWidget *>(this->widgetFor[ui->Team1Score->objectName()])};
+    score->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->Team1Score);
+}
+
+void MainWindow::on_Team2Score_textChanged(const QString &arg1)
+{
+    SpinBoxWidget *score {dynamic_cast<SpinBoxWidget *>(this->widgetFor[ui->Team2Score->objectName()])};
+    score->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->Team2Score);
+}
+
+void MainWindow::on_ResetScoresButton_clicked()
+{
+    ui->Team1Score->setValue(0);
+    ui->Team2Score->setValue(0);
+    ui->AlphaWinGame1->setChecked(false);
+    CheckBoxWidget *alphaWin1 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame1->objectName()])};
+    alphaWin1->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->AlphaWinGame1, "/teamAlpha/");
+    ui->AlphaWinGame2->setChecked(false);
+    CheckBoxWidget *alphaWin2 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame2->objectName()])};
+    alphaWin2->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->AlphaWinGame2, "/teamAlpha/");
+    ui->AlphaWinGame3->setChecked(false);
+    CheckBoxWidget *alphaWin3 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame3->objectName()])};
+    alphaWin3->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->AlphaWinGame3, "/teamAlpha/");
+    ui->AlphaWinGame4->setChecked(false);
+    CheckBoxWidget *alphaWin4 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame4->objectName()])};
+    alphaWin4->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->AlphaWinGame4, "/teamAlpha/");
+    ui->AlphaWinGame5->setChecked(false);
+    CheckBoxWidget *alphaWin5 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame5->objectName()])};
+    alphaWin5->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->AlphaWinGame5, "/teamAlpha/");
+    ui->AlphaWinGame6->setChecked(false);
+    CheckBoxWidget *alphaWin6 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame6->objectName()])};
+    alphaWin6->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->AlphaWinGame6, "/teamAlpha/");
+    ui->AlphaWinGame7->setChecked(false);
+    CheckBoxWidget *alphaWin7 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame7->objectName()])};
+    alphaWin7->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->AlphaWinGame7, "/teamAlpha/");
+    ui->AlphaWinGame8->setChecked(false);
+    CheckBoxWidget *alphaWin8 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame8->objectName()])};
+    alphaWin8->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->AlphaWinGame8, "/teamAlpha/");
+    ui->AlphaWinGame9->setChecked(false);
+    CheckBoxWidget *alphaWin9 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame9->objectName()])};
+    alphaWin9->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->AlphaWinGame9, "/teamAlpha/");
+    ui->BetaWinGame1->setChecked(false);
+    CheckBoxWidget *betaWin1 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame1->objectName()])};
+    betaWin1->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame1, "/teamBeta/");
+    ui->BetaWinGame2->setChecked(false);
+    CheckBoxWidget *betaWin2 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame2->objectName()])};
+    betaWin2->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame2, "/teamBeta/");
+    ui->BetaWinGame3->setChecked(false);
+    CheckBoxWidget *betaWin3 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame3->objectName()])};
+    betaWin3->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame3, "/teamBeta/");
+    ui->BetaWinGame4->setChecked(false);
+    CheckBoxWidget *betaWin4 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame4->objectName()])};
+    betaWin4->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame4, "/teamBeta/");
+    ui->BetaWinGame5->setChecked(false);
+    CheckBoxWidget *betaWin5 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame5->objectName()])};
+    betaWin5->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame5, "/teamBeta/");
+    ui->BetaWinGame6->setChecked(false);
+    CheckBoxWidget *betaWin6 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame6->objectName()])};
+    betaWin6->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame6, "/teamBeta/");
+    ui->BetaWinGame7->setChecked(false);
+    CheckBoxWidget *betaWin7 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame7->objectName()])};
+    betaWin7->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame7, "/teamBeta/");
+    ui->BetaWinGame8->setChecked(false);
+    CheckBoxWidget *betaWin8 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame8->objectName()])};
+    betaWin8->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame8, "/teamBeta/");
+    ui->BetaWinGame9->setChecked(false);
+    CheckBoxWidget *betaWin9 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame9->objectName()])};
+    betaWin9->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame9, "/teamBeta/");
+    ui->RadioGame1->setChecked(true);
+}
+
+/*
+/ END Round Section
 */
 
 /*
@@ -295,29 +522,33 @@ void MainWindow::on_SetDirectoriesButton_clicked()
 
 void MainWindow::on_TitleEdit_editingFinished()
 {
-    LineEditWidget *lin {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->TitleEdit->objectName()])};
-    lin->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->TitleEdit);
+    LineEditWidget *title {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->TitleEdit->objectName()])};
+    title->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->TitleEdit);
 }
 
 void MainWindow::on_SubtitleEdit_editingFinished()
 {
-    QString filename = this->directoryFor["/ImportingFilesDirectory.txt"];
-    filename.append("/info/subtitle.txt");
-    this->writeInFile(filename, ui->SubtitleEdit->text());
+    LineEditWidget *subtitle {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->SubtitleEdit->objectName()])};
+    subtitle->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->SubtitleEdit);
 }
 
 void MainWindow::on_TwitterEdit_editingFinished()
 {
-    QString filename = this->directoryFor["/ImportingFilesDirectory.txt"];
-    filename.append("/info/twitter.txt");
-    this->writeInFile(filename, ui->TwitterEdit->text());
+    LineEditWidget *twitter {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->TwitterEdit->objectName()])};
+    twitter->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->TwitterEdit);
 }
 
 void MainWindow::on_MessageEdit_textChanged()
 {
-    QString filename = this->directoryFor["/ImportingFilesDirectory.txt"];
-    filename.append("/info/message.txt");
-    this->writeInFile(filename, ui->MessageEdit->toPlainText());
+    PlainTextWidget *twitter {dynamic_cast<PlainTextWidget *>(this->widgetFor[ui->MessageEdit->objectName()])};
+    twitter->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->MessageEdit);
+}
+
+void MainWindow::on_LogoCombo_activated(int index)
+{
+    QString local = this->directoryFor["/LogosDirectory.txt"];
+    ComboBoxWidget *logoCombo {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->LogoCombo->objectName()])};
+    logoCombo->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->LogoCombo, "image", local);
 }
 
 /*
@@ -330,116 +561,553 @@ void MainWindow::on_MessageEdit_textChanged()
 
 void MainWindow::on_Caster1NameEdit_editingFinished()
 {
-    QString filename = this->directoryFor["/ImportingFilesDirectory.txt"];
-    filename.append("/casters/1Name.txt");
-    this->writeInFile(filename, ui->Caster1NameEdit->text());
+    LineEditWidget *name {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Caster1NameEdit->objectName()])};
+    name->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->Caster1NameEdit);
 }
 
 
 void MainWindow::on_Caster2NameEdit_editingFinished()
 {
-    QString filename = this->directoryFor["/ImportingFilesDirectory.txt"];
-    filename.append("/casters/2Name.txt");
-    this->writeInFile(filename, ui->Caster2NameEdit->text());
+    LineEditWidget *name {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Caster2NameEdit->objectName()])};
+    name->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->Caster2NameEdit);
 }
 
 
 void MainWindow::on_Caster3NameEdit_editingFinished()
 {
-    QString filename = this->directoryFor["/ImportingFilesDirectory.txt"];
-    filename.append("/casters/3Name.txt");
-    this->writeInFile(filename, ui->Caster3NameEdit->text());
+    LineEditWidget *name {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Caster3NameEdit->objectName()])};
+    name->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->Caster3NameEdit);
 }
 
 
 void MainWindow::on_Caster1TwitterEdit_editingFinished()
 {
-    QString filename = this->directoryFor["/ImportingFilesDirectory.txt"];
-    filename.append("/casters/1Twitter.txt");
-    this->writeInFile(filename, ui->Caster1TwitterEdit->text());
+    LineEditWidget *twitter {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Caster1TwitterEdit->objectName()])};
+    twitter->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->Caster1TwitterEdit);
 }
 
 
 void MainWindow::on_Caster2TwitterEdit_editingFinished()
 {
-    QString filename = this->directoryFor["/ImportingFilesDirectory.txt"];
-    filename.append("/casters/2Twitter.txt");
-    this->writeInFile(filename, ui->Caster2TwitterEdit->text());
+    LineEditWidget *twitter {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Caster2TwitterEdit->objectName()])};
+    twitter->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->Caster2TwitterEdit);
 }
 
 
 void MainWindow::on_Caster3TwitterEdit_editingFinished()
 {
-    QString filename = this->directoryFor["/ImportingFilesDirectory.txt"];
-    filename.append("/casters/3Twitter.txt");
-    this->writeInFile(filename, ui->Caster3TwitterEdit->text());
+    LineEditWidget *twitter {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Caster3TwitterEdit->objectName()])};
+    twitter->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->Caster3TwitterEdit);
 }
 /*
 / END Casters Section
 */
 
-// qDebug() << "debug text"
-
-void MainWindow::on_Team1Score_textChanged(const QString &arg1)
-{
-    QString filename = this->directoryFor["/ImportingFilesDirectory.txt"];
-    filename.append("/teamAlpha/score.txt");
-    this->writeInFile(filename, arg1);
-}
-
-
-void MainWindow::on_Team2Score_textChanged(const QString &arg1)
-{
-    QString filename = this->directoryFor["/ImportingFilesDirectory.txt"];
-    filename.append("/teamBeta/score.txt");
-    this->writeInFile(filename, arg1);
-}
-
-void MainWindow::on_ResetScoresButton_clicked()
-{
-    ui->Team1Score->setValue(0);
-    ui->Team2Score->setValue(0);
-    ui->AlphaWinRound1->setChecked(false);
-    ui->AlphaWinRound2->setChecked(false);
-    ui->AlphaWinRound3->setChecked(false);
-    ui->AlphaWinRound4->setChecked(false);
-    ui->AlphaWinRound5->setChecked(false);
-    ui->AlphaWinRound6->setChecked(false);
-    ui->AlphaWinRound7->setChecked(false);
-    ui->AlphaWinRound8->setChecked(false);
-    ui->AlphaWinRound9->setChecked(false);
-    ui->BetaWinRound1->setChecked(false);
-    ui->BetaWinRound2->setChecked(false);
-    ui->BetaWinRound3->setChecked(false);
-    ui->BetaWinRound4->setChecked(false);
-    ui->BetaWinRound5->setChecked(false);
-    ui->BetaWinRound6->setChecked(false);
-    ui->BetaWinRound7->setChecked(false);
-    ui->BetaWinRound8->setChecked(false);
-    ui->BetaWinRound9->setChecked(false);
-}
-
 /*
 / Set Section
 */
 
-void MainWindow::on_MapComboRound1_textChanged(const QString &arg1)
+void MainWindow::on_ModeComboGame1_activated(int index)
 {
-    QString filename = this->directoryFor["/ImportingFilesDirectory.txt"];
+    QString local = this->directoryFor["/ModeIconsDirectory.txt"];
+    ComboBoxWidget *modeCombo {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->ModeComboGame1->objectName()])};
+    modeCombo->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->ModeComboGame1, "image", local);
+    if (ui->RadioGame1->isChecked()) {
+        this->on_RadioGame1_clicked();
+    }
+}
+
+void MainWindow::on_ModeComboGame2_activated(int index)
+{
+    QString local = this->directoryFor["/ModeIconsDirectory.txt"];
+    ComboBoxWidget *modeCombo {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->ModeComboGame2->objectName()])};
+    modeCombo->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->ModeComboGame2, "image", local);
+    if (ui->RadioGame2->isChecked()) {
+        this->on_RadioGame2_clicked();
+    }
+}
+
+void MainWindow::on_ModeComboGame3_activated(int index)
+{
+    QString local = this->directoryFor["/ModeIconsDirectory.txt"];
+    ComboBoxWidget *modeCombo {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->ModeComboGame3->objectName()])};
+    modeCombo->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->ModeComboGame3, "image", local);
+    if (ui->RadioGame3->isChecked()) {
+        this->on_RadioGame3_clicked();
+    }
+}
+
+void MainWindow::on_ModeComboGame4_activated(int index)
+{
+    QString local = this->directoryFor["/ModeIconsDirectory.txt"];
+    ComboBoxWidget *modeCombo {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->ModeComboGame4->objectName()])};
+    modeCombo->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->ModeComboGame4, "image", local);
+    if (ui->RadioGame4->isChecked()) {
+        this->on_RadioGame4_clicked();
+    }
+}
+
+void MainWindow::on_ModeComboGame5_activated(int index)
+{
+    QString local = this->directoryFor["/ModeIconsDirectory.txt"];
+    ComboBoxWidget *modeCombo {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->ModeComboGame5->objectName()])};
+    modeCombo->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->ModeComboGame5, "image", local);
+    if (ui->RadioGame5->isChecked()) {
+        this->on_RadioGame5_clicked();
+    }
+}
+
+void MainWindow::on_ModeComboGame6_activated(int index)
+{
+    QString local = this->directoryFor["/ModeIconsDirectory.txt"];
+    ComboBoxWidget *modeCombo {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->ModeComboGame6->objectName()])};
+    modeCombo->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->ModeComboGame6, "image", local);
+    if (ui->RadioGame6->isChecked()) {
+        this->on_RadioGame6_clicked();
+    }
+}
+
+void MainWindow::on_ModeComboGame7_activated(int index)
+{
+    QString local = this->directoryFor["/ModeIconsDirectory.txt"];
+    ComboBoxWidget *modeCombo {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->ModeComboGame7->objectName()])};
+    modeCombo->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->ModeComboGame7, "image", local);
+    if (ui->RadioGame7->isChecked()) {
+        this->on_RadioGame7_clicked();
+    }
+}
+
+void MainWindow::on_ModeComboGame8_activated(int index)
+{
+    QString local = this->directoryFor["/ModeIconsDirectory.txt"];
+    ComboBoxWidget *modeCombo {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->ModeComboGame8->objectName()])};
+    modeCombo->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->ModeComboGame8, "image", local);
+    if (ui->RadioGame8->isChecked()) {
+        this->on_RadioGame8_clicked();
+    }
+}
+
+void MainWindow::on_ModeComboGame9_activated(int index)
+{
+    QString local = this->directoryFor["/ModeIconsDirectory.txt"];
+    ComboBoxWidget *modeCombo {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->ModeComboGame9->objectName()])};
+    modeCombo->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->ModeComboGame9, "image", local);
+    if (ui->RadioGame9->isChecked()) {
+        this->on_RadioGame9_clicked();
+    }
+}
+
+void MainWindow::on_MapComboGame1_editingFinished()
+{
+    QString local = this->directoryFor["/MapsDirectory.txt"];
+    LineEditWidget *mapCombo1 {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->MapComboGame1->objectName()])};
+    mapCombo1->saveWithImage(this->directoryFor["/ImportingFilesDirectory.txt"], ui->MapComboGame1, local);
+    if (ui->RadioGame1->isChecked()) {
+        this->on_RadioGame1_clicked();
+    }
+}
+
+void MainWindow::on_MapComboGame2_editingFinished()
+{
+    QString local = this->directoryFor["/MapsDirectory.txt"];
+    LineEditWidget *mapCombo2 {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->MapComboGame2->objectName()])};
+    mapCombo2->saveWithImage(this->directoryFor["/ImportingFilesDirectory.txt"], ui->MapComboGame2, local);
+    if (ui->RadioGame2->isChecked()) {
+        this->on_RadioGame2_clicked();
+    }
+}
+
+void MainWindow::on_MapComboGame3_editingFinished()
+{
+    QString local = this->directoryFor["/MapsDirectory.txt"];
+    LineEditWidget *mapCombo3 {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->MapComboGame3->objectName()])};
+    mapCombo3->saveWithImage(this->directoryFor["/ImportingFilesDirectory.txt"], ui->MapComboGame3, local);
+    if (ui->RadioGame3->isChecked()) {
+        this->on_RadioGame3_clicked();
+    }
+}
+
+void MainWindow::on_MapComboGame4_editingFinished()
+{
+    QString local = this->directoryFor["/MapsDirectory.txt"];
+    LineEditWidget *mapCombo4 {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->MapComboGame4->objectName()])};
+    mapCombo4->saveWithImage(this->directoryFor["/ImportingFilesDirectory.txt"], ui->MapComboGame4, local);
+    if (ui->RadioGame4->isChecked()) {
+        this->on_RadioGame4_clicked();
+    }
+}
+
+void MainWindow::on_MapComboGame5_editingFinished()
+{
+    QString local = this->directoryFor["/MapsDirectory.txt"];
+    LineEditWidget *mapCombo5 {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->MapComboGame5->objectName()])};
+    mapCombo5->saveWithImage(this->directoryFor["/ImportingFilesDirectory.txt"], ui->MapComboGame5, local);
+    if (ui->RadioGame5->isChecked()) {
+        this->on_RadioGame5_clicked();
+    }
+}
+
+void MainWindow::on_MapComboGame6_editingFinished()
+{
+    QString local = this->directoryFor["/MapsDirectory.txt"];
+    LineEditWidget *mapCombo6 {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->MapComboGame6->objectName()])};
+    mapCombo6->saveWithImage(this->directoryFor["/ImportingFilesDirectory.txt"], ui->MapComboGame6, local);
+    if (ui->RadioGame6->isChecked()) {
+        this->on_RadioGame6_clicked();
+    }
+}
+
+void MainWindow::on_MapComboGame7_editingFinished()
+{
+    QString local = this->directoryFor["/MapsDirectory.txt"];
+    LineEditWidget *mapCombo7 {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->MapComboGame7->objectName()])};
+    mapCombo7->saveWithImage(this->directoryFor["/ImportingFilesDirectory.txt"], ui->MapComboGame7, local);
+    if (ui->RadioGame7->isChecked()) {
+        this->on_RadioGame7_clicked();
+    }
+}
+
+void MainWindow::on_MapComboGame8_editingFinished()
+{
+    QString local = this->directoryFor["/MapsDirectory.txt"];
+    LineEditWidget *mapCombo8 {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->MapComboGame8->objectName()])};
+    mapCombo8->saveWithImage(this->directoryFor["/ImportingFilesDirectory.txt"], ui->MapComboGame8, local);
+    if (ui->RadioGame8->isChecked()) {
+        this->on_RadioGame8_clicked();
+    }
+}
+
+void MainWindow::on_MapComboGame9_editingFinished()
+{
+    QString local = this->directoryFor["/MapsDirectory.txt"];
+    LineEditWidget *mapCombo9 {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->MapComboGame9->objectName()])};
+    mapCombo9->saveWithImage(this->directoryFor["/ImportingFilesDirectory.txt"], ui->MapComboGame9, local);
+    if (ui->RadioGame9->isChecked()) {
+        this->on_RadioGame9_clicked();
+    }
+}
+
+void MainWindow::on_RadioGame1_clicked()
+{
+    RadioButtonWidget *game1 {dynamic_cast<RadioButtonWidget *>(this->widgetFor[ui->RadioGame1->objectName()])};
+    game1->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], "1");
+}
+
+void MainWindow::on_RadioGame2_clicked()
+{
+    RadioButtonWidget *game2 {dynamic_cast<RadioButtonWidget *>(this->widgetFor[ui->RadioGame2->objectName()])};
+    game2->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], "2");
+}
+
+void MainWindow::on_RadioGame3_clicked()
+{
+    RadioButtonWidget *game3 {dynamic_cast<RadioButtonWidget *>(this->widgetFor[ui->RadioGame3->objectName()])};
+    game3->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], "3");
+}
+
+void MainWindow::on_RadioGame4_clicked()
+{
+    RadioButtonWidget *game4 {dynamic_cast<RadioButtonWidget *>(this->widgetFor[ui->RadioGame4->objectName()])};
+    game4->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], "4");
+}
+
+void MainWindow::on_RadioGame5_clicked()
+{
+    RadioButtonWidget *game5 {dynamic_cast<RadioButtonWidget *>(this->widgetFor[ui->RadioGame5->objectName()])};
+    game5->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], "5");
+}
+
+void MainWindow::on_RadioGame6_clicked()
+{
+    RadioButtonWidget *game6 {dynamic_cast<RadioButtonWidget *>(this->widgetFor[ui->RadioGame6->objectName()])};
+    game6->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], "6");
+}
+
+void MainWindow::on_RadioGame7_clicked()
+{
+    RadioButtonWidget *game7 {dynamic_cast<RadioButtonWidget *>(this->widgetFor[ui->RadioGame7->objectName()])};
+    game7->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], "7");
+}
+
+void MainWindow::on_RadioGame8_clicked()
+{
+    RadioButtonWidget *game8 {dynamic_cast<RadioButtonWidget *>(this->widgetFor[ui->RadioGame8->objectName()])};
+    game8->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], "8");
+}
+
+void MainWindow::on_RadioGame9_clicked()
+{
+    RadioButtonWidget *game9 {dynamic_cast<RadioButtonWidget *>(this->widgetFor[ui->RadioGame9->objectName()])};
+    game9->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], "9");
+}
+
+void MainWindow::on_AlphaWinGame1_clicked()
+{
+    CheckBoxWidget *alphaWin {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame1->objectName()])};
+    alphaWin->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->AlphaWinGame1, "/teamAlpha/");
+    ui->BetaWinGame1->setChecked(false);
+    if (ui->RadioGame1->isChecked()) {
+        this->on_RadioGame1_clicked();
+        if (ui->UpdateRoundCheckbox->isChecked()) {
+            ui->RadioGame2->setChecked(true);
+            this->on_RadioGame2_clicked();
+        }
+    }
+    this->scoreAutoUpdate(ui->Team1Score, ui->AlphaWinGame1);
+}
+
+void MainWindow::on_AlphaWinGame2_clicked()
+{
+    CheckBoxWidget *alphaWin {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame2->objectName()])};
+    alphaWin->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->AlphaWinGame2, "/teamAlpha/");
+    ui->BetaWinGame2->setChecked(false);
+    if (ui->RadioGame2->isChecked()) {
+        this->on_RadioGame2_clicked();
+        if (ui->UpdateRoundCheckbox->isChecked()) {
+            ui->RadioGame3->setChecked(true);
+            this->on_RadioGame3_clicked();
+        }
+    }
+    this->scoreAutoUpdate(ui->Team1Score, ui->AlphaWinGame2);
+}
+
+void MainWindow::on_AlphaWinGame3_clicked()
+{
+    CheckBoxWidget *alphaWin {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame3->objectName()])};
+    alphaWin->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->AlphaWinGame3, "/teamAlpha/");
+    ui->BetaWinGame3->setChecked(false);
+    if (ui->RadioGame3->isChecked()) {
+        this->on_RadioGame3_clicked();
+        if (ui->UpdateRoundCheckbox->isChecked()) {
+            ui->RadioGame4->setChecked(true);
+            this->on_RadioGame4_clicked();
+        }
+    }
+    this->scoreAutoUpdate(ui->Team1Score, ui->AlphaWinGame3);
+}
+
+void MainWindow::on_AlphaWinGame4_clicked()
+{
+    CheckBoxWidget *alphaWin {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame4->objectName()])};
+    alphaWin->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->AlphaWinGame4, "/teamAlpha/");
+    ui->BetaWinGame4->setChecked(false);
+    if (ui->RadioGame4->isChecked()) {
+        this->on_RadioGame4_clicked();
+        if (ui->UpdateRoundCheckbox->isChecked()) {
+            ui->RadioGame5->setChecked(true);
+            this->on_RadioGame5_clicked();
+        }
+    }
+    this->scoreAutoUpdate(ui->Team1Score, ui->AlphaWinGame4);
+}
+
+void MainWindow::on_AlphaWinGame5_clicked()
+{
+    CheckBoxWidget *alphaWin {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame5->objectName()])};
+    alphaWin->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->AlphaWinGame5, "/teamAlpha/");
+    ui->BetaWinGame5->setChecked(false);
+    if (ui->RadioGame5->isChecked()) {
+        this->on_RadioGame5_clicked();
+        if (ui->UpdateRoundCheckbox->isChecked()) {
+            ui->RadioGame6->setChecked(true);
+            this->on_RadioGame6_clicked();
+        }
+    }
+    this->scoreAutoUpdate(ui->Team1Score, ui->AlphaWinGame5);
+}
+
+void MainWindow::on_AlphaWinGame6_clicked()
+{
+    CheckBoxWidget *alphaWin {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame6->objectName()])};
+    alphaWin->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->AlphaWinGame6, "/teamAlpha/");
+    ui->BetaWinGame6->setChecked(false);
+    if (ui->RadioGame6->isChecked()) {
+        this->on_RadioGame6_clicked();
+        if (ui->UpdateRoundCheckbox->isChecked()) {
+            ui->RadioGame7->setChecked(true);
+            this->on_RadioGame7_clicked();
+        }
+    }
+    this->scoreAutoUpdate(ui->Team1Score, ui->AlphaWinGame6);
+}
+
+void MainWindow::on_AlphaWinGame7_clicked()
+{
+    CheckBoxWidget *alphaWin {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame7->objectName()])};
+    alphaWin->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->AlphaWinGame7, "/teamAlpha/");
+    ui->BetaWinGame7->setChecked(false);
+    if (ui->RadioGame7->isChecked()) {
+        this->on_RadioGame7_clicked();
+        if (ui->UpdateRoundCheckbox->isChecked()) {
+            ui->RadioGame8->setChecked(true);
+            this->on_RadioGame8_clicked();
+        }
+    }
+    this->scoreAutoUpdate(ui->Team1Score, ui->AlphaWinGame7);
+}
+
+void MainWindow::on_AlphaWinGame8_clicked()
+{
+    CheckBoxWidget *alphaWin {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame8->objectName()])};
+    alphaWin->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->AlphaWinGame8, "/teamAlpha/");
+    ui->BetaWinGame8->setChecked(false);
+    if (ui->RadioGame8->isChecked()) {
+        this->on_RadioGame8_clicked();
+        if (ui->UpdateRoundCheckbox->isChecked()) {
+            ui->RadioGame9->setChecked(true);
+            this->on_RadioGame9_clicked();
+        }
+    }
+    this->scoreAutoUpdate(ui->Team1Score, ui->AlphaWinGame8);
+}
+
+void MainWindow::on_AlphaWinGame9_clicked()
+{
+    CheckBoxWidget *alphaWin {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame9->objectName()])};
+    alphaWin->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->AlphaWinGame9, "/teamAlpha/");
+    ui->BetaWinGame9->setChecked(false);
+    this->scoreAutoUpdate(ui->Team1Score, ui->AlphaWinGame9);
+}
+
+void MainWindow::on_BetaWinGame1_clicked()
+{
+    CheckBoxWidget *betaWin {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame1->objectName()])};
+    betaWin->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame1, "/teamBeta/");
+    ui->AlphaWinGame1->setChecked(false);
+    if (ui->RadioGame1->isChecked()) {
+        this->on_RadioGame1_clicked();
+        if (ui->UpdateRoundCheckbox->isChecked()) {
+            ui->RadioGame2->setChecked(true);
+            this->on_RadioGame2_clicked();
+        }
+    }
+    this->scoreAutoUpdate(ui->Team2Score, ui->BetaWinGame1);
+}
+
+void MainWindow::on_BetaWinGame2_clicked()
+{
+    CheckBoxWidget *betaWin {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame2->objectName()])};
+    betaWin->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame2, "/teamBeta/");
+    ui->AlphaWinGame2->setChecked(false);
+    if (ui->RadioGame2->isChecked()) {
+        this->on_RadioGame2_clicked();
+        if (ui->UpdateRoundCheckbox->isChecked()) {
+            ui->RadioGame3->setChecked(true);
+            this->on_RadioGame3_clicked();
+        }
+    }
+    this->scoreAutoUpdate(ui->Team2Score, ui->BetaWinGame2);
+}
+
+void MainWindow::on_BetaWinGame3_clicked()
+{
+    CheckBoxWidget *betaWin {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame3->objectName()])};
+    betaWin->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame3, "/teamBeta/");
+    ui->AlphaWinGame3->setChecked(false);
+    if (ui->RadioGame3->isChecked()) {
+        this->on_RadioGame3_clicked();
+        if (ui->UpdateRoundCheckbox->isChecked()) {
+            ui->RadioGame4->setChecked(true);
+            this->on_RadioGame4_clicked();
+        }
+    }
+    this->scoreAutoUpdate(ui->Team2Score, ui->BetaWinGame3);
+}
+
+void MainWindow::on_BetaWinGame4_clicked()
+{
+    CheckBoxWidget *betaWin {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame4->objectName()])};
+    betaWin->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame4, "/teamBeta/");
+    ui->AlphaWinGame4->setChecked(false);
+    if (ui->RadioGame4->isChecked()) {
+        this->on_RadioGame4_clicked();
+        if (ui->UpdateRoundCheckbox->isChecked()) {
+            ui->RadioGame5->setChecked(true);
+            this->on_RadioGame5_clicked();
+        }
+    }
+    this->scoreAutoUpdate(ui->Team2Score, ui->BetaWinGame4);
+}
+
+void MainWindow::on_BetaWinGame5_clicked()
+{
+    CheckBoxWidget *betaWin {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame5->objectName()])};
+    betaWin->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame5, "/teamBeta/");
+    ui->AlphaWinGame5->setChecked(false);
+    if (ui->RadioGame5->isChecked()) {
+        this->on_RadioGame5_clicked();
+        if (ui->UpdateRoundCheckbox->isChecked()) {
+            ui->RadioGame6->setChecked(true);
+            this->on_RadioGame6_clicked();
+        }
+    }
+    this->scoreAutoUpdate(ui->Team2Score, ui->BetaWinGame5);
+}
+
+void MainWindow::on_BetaWinGame6_clicked()
+{
+    CheckBoxWidget *betaWin {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame6->objectName()])};
+    betaWin->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame6, "/teamBeta/");
+    ui->AlphaWinGame6->setChecked(false);
+    if (ui->RadioGame6->isChecked()) {
+        this->on_RadioGame6_clicked();
+        if (ui->UpdateRoundCheckbox->isChecked()) {
+            ui->RadioGame7->setChecked(true);
+            this->on_RadioGame7_clicked();
+        }
+    }
+    this->scoreAutoUpdate(ui->Team2Score, ui->BetaWinGame6);
+}
+
+void MainWindow::on_BetaWinGame7_clicked()
+{
+    CheckBoxWidget *betaWin {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame7->objectName()])};
+    betaWin->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame7, "/teamBeta/");
+    ui->AlphaWinGame7->setChecked(false);
+    if (ui->RadioGame7->isChecked()) {
+        this->on_RadioGame7_clicked();
+        if (ui->UpdateRoundCheckbox->isChecked()) {
+            ui->RadioGame8->setChecked(true);
+            this->on_RadioGame8_clicked();
+        }
+    }
+    this->scoreAutoUpdate(ui->Team2Score, ui->BetaWinGame7);
+}
+
+void MainWindow::on_BetaWinGame8_clicked()
+{
+    CheckBoxWidget *betaWin {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame8->objectName()])};
+    betaWin->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame8, "/teamBeta/");
+    ui->AlphaWinGame8->setChecked(false);
+    if (ui->RadioGame8->isChecked()) {
+        this->on_RadioGame8_clicked();
+        if (ui->UpdateRoundCheckbox->isChecked()) {
+            ui->RadioGame9->setChecked(true);
+            this->on_RadioGame9_clicked();
+        }
+    }
+    this->scoreAutoUpdate(ui->Team2Score, ui->BetaWinGame8);
+}
+
+void MainWindow::on_BetaWinGame9_clicked()
+{
+    CheckBoxWidget *betaWin {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame9->objectName()])};
+    betaWin->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame9, "/teamBeta/");
+    ui->AlphaWinGame9->setChecked(false);
+    this->scoreAutoUpdate(ui->Team2Score, ui->BetaWinGame9);
 }
 
 /*
 / END Set Section
 */
 
-
 QMap<QString, MyWidget*> MainWindow::widgets_init()
 {
     QString filenames[] = {
-        "name.txt", "region.txt", "logo", "color", "score.txt", "name.txt",
-        "region.txt", "logo", "color", "score.txt", "title.txt", "subtitle.txt", "twitter.txt",
+        "name.txt", "region", "logo", "color", "score.txt", "name.txt",
+        "region", "logo", "color", "score.txt", "title.txt", "subtitle.txt", "twitter.txt",
         "message.txt", "tournamentLogo", "1Name.txt", "2Name.txt", "3Name.txt", "1Twitter.txt",
-        "2Twitter.txt", "3Twitter.txt", "round.txt", "colorGroups.txt", "colors", "1",
+        "2Twitter.txt", "3Twitter.txt", "round.txt", "colorGroups", "colors", "1",
         "2", "3", "4", "5", "6", "7",
         "8", "9", "1", "2", "3", "4",
         "5", "6", "7", "8", "9", "currentGame.txt",
@@ -477,7 +1145,7 @@ QMap<QString, MyWidget*> MainWindow::widgets_init()
     arr[10] = new LineEditWidget(importDirs[10], filenames[10]);
     arr[11] = new LineEditWidget(importDirs[11], filenames[11]);
     arr[12] = new LineEditWidget(importDirs[12], filenames[12]);
-    arr[13] = new LineEditWidget(importDirs[13], filenames[13]);
+    arr[13] = new PlainTextWidget(importDirs[13], filenames[13]);
     arr[14] = new ComboBoxWidget(importDirs[14], filenames[14]);
     arr[15] = new LineEditWidget(importDirs[15], filenames[15]);
     arr[16] = new LineEditWidget(importDirs[16], filenames[16]);
@@ -558,51 +1226,131 @@ QMap<QString, MyWidget*> MainWindow::widgets_init()
         {ui->RoundEdit ->objectName(), arr[21]},
         {ui->ColorGroupCombo ->objectName(), arr[22]},
         {ui->ColorsCombo ->objectName(), arr[23]},
-        {ui->AlphaWinRound1 ->objectName(), arr[24]},
-        {ui->AlphaWinRound2 ->objectName(), arr[25]},
-        {ui->AlphaWinRound3 ->objectName(), arr[26]},
-        {ui->AlphaWinRound4 ->objectName(), arr[27]},
-        {ui->AlphaWinRound5 ->objectName(), arr[28]},
-        {ui->AlphaWinRound6 ->objectName(), arr[29]},
-        {ui->AlphaWinRound7 ->objectName(), arr[30]},
-        {ui->AlphaWinRound8 ->objectName(), arr[31]},
-        {ui->AlphaWinRound9 ->objectName(), arr[32]},
-        {ui->BetaWinRound1 ->objectName(), arr[33]},
-        {ui->BetaWinRound2 ->objectName(), arr[34]},
-        {ui->BetaWinRound3 ->objectName(), arr[35]},
-        {ui->BetaWinRound4 ->objectName(), arr[36]},
-        {ui->BetaWinRound5 ->objectName(), arr[37]},
-        {ui->BetaWinRound6 ->objectName(), arr[38]},
-        {ui->BetaWinRound7 ->objectName(), arr[39]},
-        {ui->BetaWinRound8 ->objectName(), arr[40]},
-        {ui->BetaWinRound9 ->objectName(), arr[41]},
-        {ui->CheckboxGame1 ->objectName(), arr[42]},
-        {ui->CheckboxGame2 ->objectName(), arr[43]},
-        {ui->CheckboxGame3 ->objectName(), arr[44]},
-        {ui->CheckboxGame4 ->objectName(), arr[45]},
-        {ui->CheckboxGame5 ->objectName(), arr[46]},
-        {ui->CheckboxGame6 ->objectName(), arr[47]},
-        {ui->CheckboxGame7 ->objectName(), arr[48]},
-        {ui->CheckboxGame8 ->objectName(), arr[49]},
-        {ui->CheckboxGame9 ->objectName(), arr[50]},
-        {ui->MapComboRound1 ->objectName(), arr[51]},
-        {ui->MapComboRound2 ->objectName(), arr[52]},
-        {ui->MapComboRound3 ->objectName(), arr[53]},
-        {ui->MapComboRound4 ->objectName(), arr[54]},
-        {ui->MapComboRound5 ->objectName(), arr[55]},
-        {ui->MapComboRound6 ->objectName(), arr[56]},
-        {ui->MapComboRound7 ->objectName(), arr[57]},
-        {ui->MapComboRound8 ->objectName(), arr[58]},
-        {ui->MapComboRound9 ->objectName(), arr[59]},
-        {ui->ModeComboRound1 ->objectName(), arr[60]},
-        {ui->ModeComboRound2 ->objectName(), arr[61]},
-        {ui->ModeComboRound3 ->objectName(), arr[62]},
-        {ui->ModeComboRound4 ->objectName(), arr[63]},
-        {ui->ModeComboRound5 ->objectName(), arr[64]},
-        {ui->ModeComboRound6 ->objectName(), arr[65]},
-        {ui->ModeComboRound7 ->objectName(), arr[66]},
-        {ui->ModeComboRound8 ->objectName(), arr[67]},
-        {ui->ModeComboRound9 ->objectName(), arr[68]}
+        {ui->AlphaWinGame1 ->objectName(), arr[24]},
+        {ui->AlphaWinGame2 ->objectName(), arr[25]},
+        {ui->AlphaWinGame3 ->objectName(), arr[26]},
+        {ui->AlphaWinGame4 ->objectName(), arr[27]},
+        {ui->AlphaWinGame5 ->objectName(), arr[28]},
+        {ui->AlphaWinGame6 ->objectName(), arr[29]},
+        {ui->AlphaWinGame7 ->objectName(), arr[30]},
+        {ui->AlphaWinGame8 ->objectName(), arr[31]},
+        {ui->AlphaWinGame9 ->objectName(), arr[32]},
+        {ui->BetaWinGame1 ->objectName(), arr[33]},
+        {ui->BetaWinGame2 ->objectName(), arr[34]},
+        {ui->BetaWinGame3 ->objectName(), arr[35]},
+        {ui->BetaWinGame4 ->objectName(), arr[36]},
+        {ui->BetaWinGame5 ->objectName(), arr[37]},
+        {ui->BetaWinGame6 ->objectName(), arr[38]},
+        {ui->BetaWinGame7 ->objectName(), arr[39]},
+        {ui->BetaWinGame8 ->objectName(), arr[40]},
+        {ui->BetaWinGame9 ->objectName(), arr[41]},
+        {ui->RadioGame1 ->objectName(), arr[42]},
+        {ui->RadioGame2 ->objectName(), arr[43]},
+        {ui->RadioGame3 ->objectName(), arr[44]},
+        {ui->RadioGame4 ->objectName(), arr[45]},
+        {ui->RadioGame5 ->objectName(), arr[46]},
+        {ui->RadioGame6 ->objectName(), arr[47]},
+        {ui->RadioGame7 ->objectName(), arr[48]},
+        {ui->RadioGame8 ->objectName(), arr[49]},
+        {ui->RadioGame9 ->objectName(), arr[50]},
+        {ui->MapComboGame1 ->objectName(), arr[51]},
+        {ui->MapComboGame2 ->objectName(), arr[52]},
+        {ui->MapComboGame3 ->objectName(), arr[53]},
+        {ui->MapComboGame4 ->objectName(), arr[54]},
+        {ui->MapComboGame5 ->objectName(), arr[55]},
+        {ui->MapComboGame6 ->objectName(), arr[56]},
+        {ui->MapComboGame7 ->objectName(), arr[57]},
+        {ui->MapComboGame8 ->objectName(), arr[58]},
+        {ui->MapComboGame9 ->objectName(), arr[59]},
+        {ui->ModeComboGame1 ->objectName(), arr[60]},
+        {ui->ModeComboGame2 ->objectName(), arr[61]},
+        {ui->ModeComboGame3 ->objectName(), arr[62]},
+        {ui->ModeComboGame4 ->objectName(), arr[63]},
+        {ui->ModeComboGame5 ->objectName(), arr[64]},
+        {ui->ModeComboGame6 ->objectName(), arr[65]},
+        {ui->ModeComboGame7 ->objectName(), arr[66]},
+        {ui->ModeComboGame8 ->objectName(), arr[67]},
+        {ui->ModeComboGame9 ->objectName(), arr[68]}
     };
     return widgets;
 }
+
+void MainWindow::on_UpdateScoreCheckbox_stateChanged(int arg1)
+{
+    if (arg1) {
+        ui->Team1Score->setDisabled(true);
+        ui->Team2Score->setDisabled(true);
+        int count = 0;
+        if (ui->AlphaWinGame1->isChecked()) count++;
+        if (ui->AlphaWinGame2->isChecked()) count++;
+        if (ui->AlphaWinGame3->isChecked()) count++;
+        if (ui->AlphaWinGame4->isChecked()) count++;
+        if (ui->AlphaWinGame5->isChecked()) count++;
+        if (ui->AlphaWinGame6->isChecked()) count++;
+        if (ui->AlphaWinGame7->isChecked()) count++;
+        if (ui->AlphaWinGame8->isChecked()) count++;
+        if (ui->AlphaWinGame9->isChecked()) count++;
+        ui->Team1Score->setValue(count);
+        count = 0;
+        if (ui->BetaWinGame1->isChecked()) count++;
+        if (ui->BetaWinGame2->isChecked()) count++;
+        if (ui->BetaWinGame3->isChecked()) count++;
+        if (ui->BetaWinGame4->isChecked()) count++;
+        if (ui->BetaWinGame5->isChecked()) count++;
+        if (ui->BetaWinGame6->isChecked()) count++;
+        if (ui->BetaWinGame7->isChecked()) count++;
+        if (ui->BetaWinGame8->isChecked()) count++;
+        if (ui->BetaWinGame9->isChecked()) count++;
+        ui->Team2Score->setValue(count);
+    } else {
+        ui->Team1Score->setDisabled(false);
+        ui->Team2Score->setDisabled(false);
+    }
+}
+
+
+void MainWindow::on_UpdateRoundCheckbox_stateChanged(int arg1)
+{
+    if (ui->UpdateRoundCheckbox->isChecked()) {
+        ui->RadioGame1->setDisabled(true);
+        ui->RadioGame2->setDisabled(true);
+        ui->RadioGame3->setDisabled(true);
+        ui->RadioGame4->setDisabled(true);
+        ui->RadioGame5->setDisabled(true);
+        ui->RadioGame6->setDisabled(true);
+        ui->RadioGame7->setDisabled(true);
+        ui->RadioGame8->setDisabled(true);
+        ui->RadioGame9->setDisabled(true);
+        QRadioButton *currentGame = ui->RadioGame1;
+        QCheckBox *alphaGames[9] = {
+            ui->AlphaWinGame1, ui->AlphaWinGame2, ui->AlphaWinGame3, ui->AlphaWinGame4,
+            ui->AlphaWinGame5, ui->AlphaWinGame6, ui->AlphaWinGame7, ui->AlphaWinGame8, ui->AlphaWinGame9
+        };
+        QCheckBox *betaGames[9] = {
+            ui->BetaWinGame1, ui->BetaWinGame2, ui->BetaWinGame3, ui->BetaWinGame4,
+            ui->BetaWinGame5, ui->BetaWinGame6, ui->BetaWinGame7, ui->BetaWinGame8, ui->BetaWinGame9
+        };
+        QRadioButton *rounds[9] = {
+            ui->RadioGame1, ui->RadioGame2, ui->RadioGame3, ui->RadioGame4,
+            ui->RadioGame5, ui->RadioGame6, ui->RadioGame7, ui->RadioGame8, ui->RadioGame9
+        };
+        for (int i = 0; i < 9; i++) {
+            if (!alphaGames[i]->isChecked() && !betaGames[i]->isChecked()) {
+                currentGame = rounds[i];
+                break;
+            }
+        }
+        currentGame->setChecked(true);
+    } else {
+        ui->RadioGame1->setDisabled(false);
+        ui->RadioGame2->setDisabled(false);
+        ui->RadioGame3->setDisabled(false);
+        ui->RadioGame4->setDisabled(false);
+        ui->RadioGame5->setDisabled(false);
+        ui->RadioGame6->setDisabled(false);
+        ui->RadioGame7->setDisabled(false);
+        ui->RadioGame8->setDisabled(false);
+        ui->RadioGame9->setDisabled(false);
+    }
+}
+

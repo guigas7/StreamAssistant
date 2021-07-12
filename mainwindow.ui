@@ -82,10 +82,10 @@
       <enum>Qt::LeftToRight</enum>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(170, 0, 0);</string>
+      <string notr="true">background-color: rgb(255, 255, 255);</string>
      </property>
      <property name="text">
-      <string>Team Color</string>
+      <string/>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -173,10 +173,10 @@
       <enum>Qt::LeftToRight</enum>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(0, 170, 0);</string>
+      <string notr="true">background-color: rgb(255, 255, 255);</string>
      </property>
      <property name="text">
-      <string>Team Color</string>
+      <string/>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -306,20 +306,20 @@
          <widget class="QSpinBox" name="Team1Score"/>
         </item>
         <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+         <widget class="QLabel" name="BothTeamsColor">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
           </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(255, 255, 255);</string>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>38</width>
-            <height>17</height>
-           </size>
+          <property name="text">
+           <string/>
           </property>
-         </spacer>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QSpinBox" name="Team2Score">
@@ -388,9 +388,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="SetDirectoriesButton">
+       <widget class="QCheckBox" name="UpdateScoreCheckbox">
         <property name="text">
-         <string>Set Directories</string>
+         <string>Auto Update Score</string>
         </property>
        </widget>
       </item>
@@ -500,7 +500,7 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_16">
       <item>
-       <widget class="QCheckBox" name="AlphaWinRound1">
+       <widget class="QCheckBox" name="AlphaWinGame1">
         <property name="maximumSize">
          <size>
           <width>16</width>
@@ -513,7 +513,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="MapComboRound1">
+       <widget class="QLineEdit" name="MapComboGame1">
         <property name="minimumSize">
          <size>
           <width>150</width>
@@ -529,7 +529,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="CheckboxGame1">
+       <widget class="QRadioButton" name="RadioGame1">
         <property name="maximumSize">
          <size>
           <width>65</width>
@@ -545,7 +545,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="ModeComboRound1">
+       <widget class="QComboBox" name="ModeComboGame1">
         <property name="minimumSize">
          <size>
           <width>110</width>
@@ -561,7 +561,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="BetaWinRound1">
+       <widget class="QCheckBox" name="BetaWinGame1">
         <property name="maximumSize">
          <size>
           <width>16</width>
@@ -586,7 +586,7 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_17">
       <item>
-       <widget class="QCheckBox" name="AlphaWinRound2">
+       <widget class="QCheckBox" name="AlphaWinGame2">
         <property name="maximumSize">
          <size>
           <width>16</width>
@@ -599,7 +599,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="MapComboRound2">
+       <widget class="QLineEdit" name="MapComboGame2">
         <property name="minimumSize">
          <size>
           <width>150</width>
@@ -615,7 +615,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="CheckboxGame2">
+       <widget class="QRadioButton" name="RadioGame2">
         <property name="maximumSize">
          <size>
           <width>65</width>
@@ -626,12 +626,12 @@
          <string>Game 2</string>
         </property>
         <attribute name="buttonGroup">
-         <string notr="true">buttonGroup_2</string>
+         <string notr="true">buttonGroup</string>
         </attribute>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="ModeComboRound2">
+       <widget class="QComboBox" name="ModeComboGame2">
         <property name="minimumSize">
          <size>
           <width>110</width>
@@ -647,7 +647,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="BetaWinRound2">
+       <widget class="QCheckBox" name="BetaWinGame2">
         <property name="maximumSize">
          <size>
           <width>16</width>
@@ -672,7 +672,7 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_18">
       <item>
-       <widget class="QCheckBox" name="AlphaWinRound3">
+       <widget class="QCheckBox" name="AlphaWinGame3">
         <property name="maximumSize">
          <size>
           <width>16</width>
@@ -685,7 +685,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="MapComboRound3">
+       <widget class="QLineEdit" name="MapComboGame3">
         <property name="minimumSize">
          <size>
           <width>150</width>
@@ -701,7 +701,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="CheckboxGame3">
+       <widget class="QRadioButton" name="RadioGame3">
         <property name="maximumSize">
          <size>
           <width>65</width>
@@ -712,12 +712,12 @@
          <string>Game 3</string>
         </property>
         <attribute name="buttonGroup">
-         <string notr="true">buttonGroup_3</string>
+         <string notr="true">buttonGroup</string>
         </attribute>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="ModeComboRound3">
+       <widget class="QComboBox" name="ModeComboGame3">
         <property name="minimumSize">
          <size>
           <width>110</width>
@@ -733,7 +733,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="BetaWinRound3">
+       <widget class="QCheckBox" name="BetaWinGame3">
         <property name="maximumSize">
          <size>
           <width>16</width>
@@ -758,7 +758,7 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_19">
       <item>
-       <widget class="QCheckBox" name="AlphaWinRound4">
+       <widget class="QCheckBox" name="AlphaWinGame4">
         <property name="maximumSize">
          <size>
           <width>16</width>
@@ -771,7 +771,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="MapComboRound4">
+       <widget class="QLineEdit" name="MapComboGame4">
         <property name="minimumSize">
          <size>
           <width>150</width>
@@ -787,7 +787,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="CheckboxGame4">
+       <widget class="QRadioButton" name="RadioGame4">
         <property name="maximumSize">
          <size>
           <width>65</width>
@@ -798,12 +798,12 @@
          <string>Game 4</string>
         </property>
         <attribute name="buttonGroup">
-         <string notr="true">buttonGroup_4</string>
+         <string notr="true">buttonGroup</string>
         </attribute>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="ModeComboRound4">
+       <widget class="QComboBox" name="ModeComboGame4">
         <property name="minimumSize">
          <size>
           <width>110</width>
@@ -819,7 +819,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="BetaWinRound4">
+       <widget class="QCheckBox" name="BetaWinGame4">
         <property name="maximumSize">
          <size>
           <width>16</width>
@@ -844,7 +844,7 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_20">
       <item>
-       <widget class="QCheckBox" name="AlphaWinRound5">
+       <widget class="QCheckBox" name="AlphaWinGame5">
         <property name="maximumSize">
          <size>
           <width>16</width>
@@ -857,7 +857,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="MapComboRound5">
+       <widget class="QLineEdit" name="MapComboGame5">
         <property name="minimumSize">
          <size>
           <width>150</width>
@@ -873,7 +873,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="CheckboxGame5">
+       <widget class="QRadioButton" name="RadioGame5">
         <property name="maximumSize">
          <size>
           <width>65</width>
@@ -884,12 +884,12 @@
          <string>Game 5</string>
         </property>
         <attribute name="buttonGroup">
-         <string notr="true">buttonGroup_5</string>
+         <string notr="true">buttonGroup</string>
         </attribute>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="ModeComboRound5">
+       <widget class="QComboBox" name="ModeComboGame5">
         <property name="minimumSize">
          <size>
           <width>110</width>
@@ -905,7 +905,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="BetaWinRound5">
+       <widget class="QCheckBox" name="BetaWinGame5">
         <property name="maximumSize">
          <size>
           <width>16</width>
@@ -930,7 +930,7 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_21">
       <item>
-       <widget class="QCheckBox" name="AlphaWinRound6">
+       <widget class="QCheckBox" name="AlphaWinGame6">
         <property name="maximumSize">
          <size>
           <width>16</width>
@@ -943,7 +943,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="MapComboRound6">
+       <widget class="QLineEdit" name="MapComboGame6">
         <property name="minimumSize">
          <size>
           <width>150</width>
@@ -959,7 +959,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="CheckboxGame6">
+       <widget class="QRadioButton" name="RadioGame6">
         <property name="maximumSize">
          <size>
           <width>65</width>
@@ -970,12 +970,12 @@
          <string>Game 6</string>
         </property>
         <attribute name="buttonGroup">
-         <string notr="true">buttonGroup_6</string>
+         <string notr="true">buttonGroup</string>
         </attribute>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="ModeComboRound6">
+       <widget class="QComboBox" name="ModeComboGame6">
         <property name="minimumSize">
          <size>
           <width>110</width>
@@ -991,7 +991,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="BetaWinRound6">
+       <widget class="QCheckBox" name="BetaWinGame6">
         <property name="maximumSize">
          <size>
           <width>16</width>
@@ -1016,7 +1016,7 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_22">
       <item>
-       <widget class="QCheckBox" name="AlphaWinRound7">
+       <widget class="QCheckBox" name="AlphaWinGame7">
         <property name="maximumSize">
          <size>
           <width>16</width>
@@ -1029,7 +1029,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="MapComboRound7">
+       <widget class="QLineEdit" name="MapComboGame7">
         <property name="minimumSize">
          <size>
           <width>150</width>
@@ -1045,7 +1045,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="CheckboxGame7">
+       <widget class="QRadioButton" name="RadioGame7">
         <property name="maximumSize">
          <size>
           <width>65</width>
@@ -1056,12 +1056,12 @@
          <string>Game 7</string>
         </property>
         <attribute name="buttonGroup">
-         <string notr="true">buttonGroup_7</string>
+         <string notr="true">buttonGroup</string>
         </attribute>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="ModeComboRound7">
+       <widget class="QComboBox" name="ModeComboGame7">
         <property name="minimumSize">
          <size>
           <width>110</width>
@@ -1077,7 +1077,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="BetaWinRound7">
+       <widget class="QCheckBox" name="BetaWinGame7">
         <property name="maximumSize">
          <size>
           <width>16</width>
@@ -1102,7 +1102,7 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_23">
       <item>
-       <widget class="QCheckBox" name="AlphaWinRound8">
+       <widget class="QCheckBox" name="AlphaWinGame8">
         <property name="maximumSize">
          <size>
           <width>16</width>
@@ -1115,7 +1115,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="MapComboRound8">
+       <widget class="QLineEdit" name="MapComboGame8">
         <property name="minimumSize">
          <size>
           <width>150</width>
@@ -1131,7 +1131,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="CheckboxGame8">
+       <widget class="QRadioButton" name="RadioGame8">
         <property name="maximumSize">
          <size>
           <width>65</width>
@@ -1142,12 +1142,12 @@
          <string>Game 8</string>
         </property>
         <attribute name="buttonGroup">
-         <string notr="true">buttonGroup_8</string>
+         <string notr="true">buttonGroup</string>
         </attribute>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="ModeComboRound8">
+       <widget class="QComboBox" name="ModeComboGame8">
         <property name="minimumSize">
          <size>
           <width>110</width>
@@ -1163,7 +1163,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="BetaWinRound8">
+       <widget class="QCheckBox" name="BetaWinGame8">
         <property name="maximumSize">
          <size>
           <width>16</width>
@@ -1188,7 +1188,7 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_24">
       <item>
-       <widget class="QCheckBox" name="AlphaWinRound9">
+       <widget class="QCheckBox" name="AlphaWinGame9">
         <property name="maximumSize">
          <size>
           <width>16</width>
@@ -1201,7 +1201,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="MapComboRound9">
+       <widget class="QLineEdit" name="MapComboGame9">
         <property name="minimumSize">
          <size>
           <width>150</width>
@@ -1217,7 +1217,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="CheckboxGame9">
+       <widget class="QRadioButton" name="RadioGame9">
         <property name="maximumSize">
          <size>
           <width>65</width>
@@ -1228,12 +1228,12 @@
          <string>Game 9</string>
         </property>
         <attribute name="buttonGroup">
-         <string notr="true">buttonGroup_9</string>
+         <string notr="true">buttonGroup</string>
         </attribute>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="ModeComboRound9">
+       <widget class="QComboBox" name="ModeComboGame9">
         <property name="minimumSize">
          <size>
           <width>110</width>
@@ -1249,7 +1249,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="BetaWinRound9">
+       <widget class="QCheckBox" name="BetaWinGame9">
         <property name="maximumSize">
          <size>
           <width>16</width>
@@ -1569,24 +1569,26 @@
    </property>
    <widget class="QMenu" name="menuTest">
     <property name="title">
-     <string>File</string>
+     <string>Settings</string>
     </property>
+    <addaction name="actionSet_Directories"/>
    </widget>
    <addaction name="menuTest"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <action name="actionSet_Directories">
+   <property name="text">
+    <string>Set Directories</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_8"/>
-  <buttongroup name="buttonGroup_9"/>
-  <buttongroup name="buttonGroup_7"/>
   <buttongroup name="buttonGroup"/>
-  <buttongroup name="buttonGroup_2"/>
-  <buttongroup name="buttonGroup_4"/>
-  <buttongroup name="buttonGroup_3"/>
-  <buttongroup name="buttonGroup_6"/>
-  <buttongroup name="buttonGroup_5"/>
  </buttongroups>
 </ui>
