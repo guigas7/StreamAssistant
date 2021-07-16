@@ -7,6 +7,8 @@
 #include <QLineEdit>
 #include <QDir>
 #include <QRandomGenerator>
+#include <QLabel>
+#include <QMetaEnum>
 
 enum Qtype { QLINEEDIT = 0, QLABEL = 1, QCOMBOBOX = 2, QSPINBOX = 3, QCHECKBOX = 4, QRADIOBUTTON = 5, QPLAINTEXTEDIT = 6 };
 
@@ -23,6 +25,9 @@ public:
     QString findImageWithExtension(QString filename);
     void copyFile(QString source, QString destiny);
     QString getRandomImageName(QString defaultDir);
+    void showImageInLabel(QString imageName, QLabel *logo, QString copyName, Qt::AspectRatioMode);
+    void ignoreAspectInLabel(QString imageName, QLabel *logo, QString copyName);
+    void keepAspectInLabel(QString imageName, QLabel *logo, QString copyName);
     virtual ~MyWidget();
 
 private:

@@ -36,7 +36,6 @@ void ComboBoxWidget::init(QString importingDir, QWidget *wid, QStringList list)
     file.close();
 }
 
-
 void ComboBoxWidget::saveInFile(QString importingDir, QWidget *wid)
 {
     QComboBox *widget = (QComboBox *) wid;
@@ -67,11 +66,10 @@ void ComboBoxWidget::saveInFile(QString importingDir, QWidget *wid, QString mode
 
 QStringList ComboBoxWidget::getListOf(QString dirString)
 {
-    QStringList completionList;
     QStringList noExtensionList;
     int lastPoint;
     QDir directory(dirString);
-    completionList = directory.entryList(QDir::Files);
+    QStringList completionList = directory.entryList(QDir::Files);
     for (int i = 0; i < completionList.size(); ++i) {
         lastPoint = completionList.at(i).lastIndexOf(".");
         if (lastPoint == -1) { // if there's no extension, keep it the same
@@ -81,4 +79,53 @@ QStringList ComboBoxWidget::getListOf(QString dirString)
         }
     }
     return noExtensionList;
+}
+
+void ComboBoxWidget::saveColor(QString colorDir, QString color, QString dirToSave, QString fileToSave, QLabel *logo)
+{
+    QString colorFile;
+    QString savingFile;
+    bool showedInAssistant = false;
+    // for colors on colorDir
+    colorFile = this->findImageWithExtension(colorDir + color);
+    savingFile = dirToSave + fileToSave;
+    if (QFile::exists(colorFile)) {
+        this->copyFile(colorFile, savingFile);
+        this->ignoreAspectInLabel(colorFile, logo, savingFile);
+        showedInAssistant = true;
+    } else {
+        QFile importingColor(savingFile);
+        importingColor.remove();
+    }
+    // for colors on //colorDir's subdirectories
+    QDir directory(colorDir);
+    QStringList dirList = directory.entryList(QDir::Dirs);
+    dirList.removeFirst(); // Take .
+    dirList.removeFirst(); // Take ..
+    for (int i = 0; i < dirList.size(); ++i) {
+        colorFile = this->findImageWithExtension(colorDir + dirList.at(i) + "/" + color);
+        savingFile = dirToSave + dirList.at(i) + "_" + fileToSave;
+        // creates dir to save if there isn't one
+        if (QFile::exists(colorFile)) {
+            this->copyFile(colorFile, savingFile);
+            if (!showedInAssistant) {
+                this->ignoreAspectInLabel(colorFile, logo, savingFile);
+                showedInAssistant = true;
+            }
+        } else {
+            QFile importingColor(savingFile);
+            importingColor.remove();
+        }
+    }
+}
+
+void ComboBoxWidget::saveColors(QString importingDir, QWidget *wid, QString local, QLabel *alphaLabel, QLabel *betaLabel, QLabel *comboLabel)
+{
+    QComboBox *widget = (QComboBox *) wid;
+    QString color = widget->currentText();
+
+    this->saveColor(local + "/alpha/", color, importingDir + "/teamAlpha/", this->getFileToSave(), alphaLabel);
+    this->saveColor(local + "/beta/", color, importingDir + "/teamBeta/", this->getFileToSave(), betaLabel);
+    this->saveColor(local + "/combo/", color, importingDir + this->getSection(), this->getFileToSave() + "s", comboLabel);
+    return;
 }

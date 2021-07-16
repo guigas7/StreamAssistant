@@ -100,10 +100,9 @@ private slots:
     void on_BetaWinGame8_clicked();
     void on_BetaWinGame9_clicked();
     void on_actionSet_Directories_triggered();
-
     void on_UpdateScoreCheckbox_stateChanged(int arg1);
-
     void on_UpdateRoundCheckbox_stateChanged(int arg1);
+    void on_ColorsCombo_activated(int index);
 
 private:
     Ui::MainWindow *ui;

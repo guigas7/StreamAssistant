@@ -12,7 +12,6 @@ FilesDialog::FilesDialog(QWidget *parent, QMap<QString, QString> *directoryForPo
     ui->setupUi(this);
     this->directoryFor = directoryForPointer;
     directories_init(directories);
-
 }
 
 FilesDialog::~FilesDialog()
@@ -286,13 +285,13 @@ void FilesDialog::directories_init(QString *dirs)
         // if no saved location create and save location for default
         if (!file.open(QFile::ReadOnly | QFile::Text)) {
              makeDefault = true;
-             file.close();
         // If there's a file
         } else {
             QTextStream in(&file);
             text = in.readAll();
             // Unless the file points to an invalid directory
             if (!QDir(text).exists()) {
+                qDebug() << "Invalid Directory: " + text;
                 makeDefault = true;
             // Set the file content as the config directory
             } else {
@@ -312,5 +311,4 @@ void FilesDialog::directories_init(QString *dirs)
             saveConfigDirectory(filename, this->fields[i]);
         }
     }
-
 }

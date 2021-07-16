@@ -91,4 +91,26 @@ QString MyWidget::getRandomImageName(QString defaultDir)
     return "Nenhuma imagem padrão para escolher";
 }
 
+void MyWidget::showImageInLabel(QString imageName, QLabel *logo, QString copyName, Qt::AspectRatioMode aspectRatioMode)
+{
+    QImage image;
+    bool valid = image.load(imageName);
+    if (valid) {
+        image = image.scaled(logo->width(), logo->height(), aspectRatioMode, Qt::SmoothTransformation);
+        logo->setPixmap(QPixmap::fromImage(image));
+    } else {
+        qDebug() << "couldn't load image " + imageName;
+    }
+}
+
+void MyWidget::ignoreAspectInLabel(QString imageName, QLabel *logo, QString copyName)
+{
+    showImageInLabel(imageName, logo, copyName, Qt::IgnoreAspectRatio);
+}
+
+void MyWidget::keepAspectInLabel(QString imageName, QLabel *logo, QString copyName)
+{
+    showImageInLabel(imageName, logo, copyName, Qt::KeepAspectRatio);
+}
+
 

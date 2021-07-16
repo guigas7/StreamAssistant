@@ -512,6 +512,84 @@ void MainWindow::on_ResetScoresButton_clicked()
     ui->RadioGame1->setChecked(true);
 }
 
+void MainWindow::on_UpdateScoreCheckbox_stateChanged(int arg1)
+{
+    if (arg1) {
+        ui->Team1Score->setDisabled(true);
+        ui->Team2Score->setDisabled(true);
+        int count = 0;
+        if (ui->AlphaWinGame1->isChecked()) count++;
+        if (ui->AlphaWinGame2->isChecked()) count++;
+        if (ui->AlphaWinGame3->isChecked()) count++;
+        if (ui->AlphaWinGame4->isChecked()) count++;
+        if (ui->AlphaWinGame5->isChecked()) count++;
+        if (ui->AlphaWinGame6->isChecked()) count++;
+        if (ui->AlphaWinGame7->isChecked()) count++;
+        if (ui->AlphaWinGame8->isChecked()) count++;
+        if (ui->AlphaWinGame9->isChecked()) count++;
+        ui->Team1Score->setValue(count);
+        count = 0;
+        if (ui->BetaWinGame1->isChecked()) count++;
+        if (ui->BetaWinGame2->isChecked()) count++;
+        if (ui->BetaWinGame3->isChecked()) count++;
+        if (ui->BetaWinGame4->isChecked()) count++;
+        if (ui->BetaWinGame5->isChecked()) count++;
+        if (ui->BetaWinGame6->isChecked()) count++;
+        if (ui->BetaWinGame7->isChecked()) count++;
+        if (ui->BetaWinGame8->isChecked()) count++;
+        if (ui->BetaWinGame9->isChecked()) count++;
+        ui->Team2Score->setValue(count);
+    } else {
+        ui->Team1Score->setDisabled(false);
+        ui->Team2Score->setDisabled(false);
+    }
+}
+
+void MainWindow::on_UpdateRoundCheckbox_stateChanged(int arg1)
+{
+    if (ui->UpdateRoundCheckbox->isChecked()) {
+        ui->RadioGame1->setDisabled(true);
+        ui->RadioGame2->setDisabled(true);
+        ui->RadioGame3->setDisabled(true);
+        ui->RadioGame4->setDisabled(true);
+        ui->RadioGame5->setDisabled(true);
+        ui->RadioGame6->setDisabled(true);
+        ui->RadioGame7->setDisabled(true);
+        ui->RadioGame8->setDisabled(true);
+        ui->RadioGame9->setDisabled(true);
+        QRadioButton *currentGame = ui->RadioGame1;
+        QCheckBox *alphaGames[9] = {
+            ui->AlphaWinGame1, ui->AlphaWinGame2, ui->AlphaWinGame3, ui->AlphaWinGame4,
+            ui->AlphaWinGame5, ui->AlphaWinGame6, ui->AlphaWinGame7, ui->AlphaWinGame8, ui->AlphaWinGame9
+        };
+        QCheckBox *betaGames[9] = {
+            ui->BetaWinGame1, ui->BetaWinGame2, ui->BetaWinGame3, ui->BetaWinGame4,
+            ui->BetaWinGame5, ui->BetaWinGame6, ui->BetaWinGame7, ui->BetaWinGame8, ui->BetaWinGame9
+        };
+        QRadioButton *rounds[9] = {
+            ui->RadioGame1, ui->RadioGame2, ui->RadioGame3, ui->RadioGame4,
+            ui->RadioGame5, ui->RadioGame6, ui->RadioGame7, ui->RadioGame8, ui->RadioGame9
+        };
+        for (int i = 0; i < 9; i++) {
+            if (!alphaGames[i]->isChecked() && !betaGames[i]->isChecked()) {
+                currentGame = rounds[i];
+                break;
+            }
+        }
+        currentGame->setChecked(true);
+    } else {
+        ui->RadioGame1->setDisabled(false);
+        ui->RadioGame2->setDisabled(false);
+        ui->RadioGame3->setDisabled(false);
+        ui->RadioGame4->setDisabled(false);
+        ui->RadioGame5->setDisabled(false);
+        ui->RadioGame6->setDisabled(false);
+        ui->RadioGame7->setDisabled(false);
+        ui->RadioGame8->setDisabled(false);
+        ui->RadioGame9->setDisabled(false);
+    }
+}
+
 /*
 / END Round Section
 */
@@ -1107,7 +1185,7 @@ QMap<QString, MyWidget*> MainWindow::widgets_init()
         "name.txt", "region", "logo", "color", "score.txt", "name.txt",
         "region", "logo", "color", "score.txt", "title.txt", "subtitle.txt", "twitter.txt",
         "message.txt", "tournamentLogo", "1Name.txt", "2Name.txt", "3Name.txt", "1Twitter.txt",
-        "2Twitter.txt", "3Twitter.txt", "round.txt", "colorGroups", "colors", "1",
+        "2Twitter.txt", "3Twitter.txt", "round.txt", "colorGroups", "color", "1",
         "2", "3", "4", "5", "6", "7",
         "8", "9", "1", "2", "3", "4",
         "5", "6", "7", "8", "9", "currentGame.txt",
@@ -1275,82 +1353,28 @@ QMap<QString, MyWidget*> MainWindow::widgets_init()
     return widgets;
 }
 
-void MainWindow::on_UpdateScoreCheckbox_stateChanged(int arg1)
+void MainWindow::on_ColorsCombo_activated(int index)
 {
-    if (arg1) {
-        ui->Team1Score->setDisabled(true);
-        ui->Team2Score->setDisabled(true);
-        int count = 0;
-        if (ui->AlphaWinGame1->isChecked()) count++;
-        if (ui->AlphaWinGame2->isChecked()) count++;
-        if (ui->AlphaWinGame3->isChecked()) count++;
-        if (ui->AlphaWinGame4->isChecked()) count++;
-        if (ui->AlphaWinGame5->isChecked()) count++;
-        if (ui->AlphaWinGame6->isChecked()) count++;
-        if (ui->AlphaWinGame7->isChecked()) count++;
-        if (ui->AlphaWinGame8->isChecked()) count++;
-        if (ui->AlphaWinGame9->isChecked()) count++;
-        ui->Team1Score->setValue(count);
-        count = 0;
-        if (ui->BetaWinGame1->isChecked()) count++;
-        if (ui->BetaWinGame2->isChecked()) count++;
-        if (ui->BetaWinGame3->isChecked()) count++;
-        if (ui->BetaWinGame4->isChecked()) count++;
-        if (ui->BetaWinGame5->isChecked()) count++;
-        if (ui->BetaWinGame6->isChecked()) count++;
-        if (ui->BetaWinGame7->isChecked()) count++;
-        if (ui->BetaWinGame8->isChecked()) count++;
-        if (ui->BetaWinGame9->isChecked()) count++;
-        ui->Team2Score->setValue(count);
-    } else {
-        ui->Team1Score->setDisabled(false);
-        ui->Team2Score->setDisabled(false);
-    }
-}
+    QString local;
 
-
-void MainWindow::on_UpdateRoundCheckbox_stateChanged(int arg1)
-{
-    if (ui->UpdateRoundCheckbox->isChecked()) {
-        ui->RadioGame1->setDisabled(true);
-        ui->RadioGame2->setDisabled(true);
-        ui->RadioGame3->setDisabled(true);
-        ui->RadioGame4->setDisabled(true);
-        ui->RadioGame5->setDisabled(true);
-        ui->RadioGame6->setDisabled(true);
-        ui->RadioGame7->setDisabled(true);
-        ui->RadioGame8->setDisabled(true);
-        ui->RadioGame9->setDisabled(true);
-        QRadioButton *currentGame = ui->RadioGame1;
-        QCheckBox *alphaGames[9] = {
-            ui->AlphaWinGame1, ui->AlphaWinGame2, ui->AlphaWinGame3, ui->AlphaWinGame4,
-            ui->AlphaWinGame5, ui->AlphaWinGame6, ui->AlphaWinGame7, ui->AlphaWinGame8, ui->AlphaWinGame9
-        };
-        QCheckBox *betaGames[9] = {
-            ui->BetaWinGame1, ui->BetaWinGame2, ui->BetaWinGame3, ui->BetaWinGame4,
-            ui->BetaWinGame5, ui->BetaWinGame6, ui->BetaWinGame7, ui->BetaWinGame8, ui->BetaWinGame9
-        };
-        QRadioButton *rounds[9] = {
-            ui->RadioGame1, ui->RadioGame2, ui->RadioGame3, ui->RadioGame4,
-            ui->RadioGame5, ui->RadioGame6, ui->RadioGame7, ui->RadioGame8, ui->RadioGame9
-        };
-        for (int i = 0; i < 9; i++) {
-            if (!alphaGames[i]->isChecked() && !betaGames[i]->isChecked()) {
-                currentGame = rounds[i];
-                break;
-            }
-        }
-        currentGame->setChecked(true);
-    } else {
-        ui->RadioGame1->setDisabled(false);
-        ui->RadioGame2->setDisabled(false);
-        ui->RadioGame3->setDisabled(false);
-        ui->RadioGame4->setDisabled(false);
-        ui->RadioGame5->setDisabled(false);
-        ui->RadioGame6->setDisabled(false);
-        ui->RadioGame7->setDisabled(false);
-        ui->RadioGame8->setDisabled(false);
-        ui->RadioGame9->setDisabled(false);
+    if (ui->ColorGroupCombo->currentText().compare("Ranked") == 0) {
+        local = this->directoryFor["/RankedColorsDirectory.txt"];
     }
+    if (ui->ColorGroupCombo->currentText().compare("Splatfest") == 0) {
+        local = this->directoryFor["/SplatfestColorsDirectory.txt"];
+    }
+    if (ui->ColorGroupCombo->currentText().compare("Turf War") == 0) {
+        local = this->directoryFor["/TurfWarColorsDirectory.txt"];
+    }
+    qDebug() << local;
+    ComboBoxWidget *colorsCombo {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->ColorsCombo->objectName()])};
+    colorsCombo->saveColors(
+        this->directoryFor["/ImportingFilesDirectory.txt"],
+        ui->ColorsCombo,
+        local,
+        ui->Team1Color,
+        ui->Team2Color,
+        ui->BothTeamsColor
+    );
 }
 

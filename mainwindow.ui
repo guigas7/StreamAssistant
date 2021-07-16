@@ -152,7 +152,7 @@
      </rect>
     </property>
     <property name="statusTip">
-     <string>0</string>
+     <string/>
     </property>
     <property name="title">
      <string>Team Beta</string>
