@@ -16,6 +16,9 @@ class FilesDialog : public QDialog
 {
     Q_OBJECT
 
+signals:
+    void allDone();
+
 public:
     explicit FilesDialog(QWidget *parent = nullptr, QMap<QString, QString> *directoryFor = nullptr, QString *directories = nullptr);
     ~FilesDialog();
@@ -52,6 +55,7 @@ private:
     QString directories[dirAmount];
     int saveConfigDirectory(QString, QLineEdit*);
     void directories_init(QString *);
+    void makeDefaultDir(QLineEdit *field, QString configFile, QString configDir);
 };
 
 #endif // FILESDIALOG_H

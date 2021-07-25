@@ -11,7 +11,7 @@ void CheckBoxWidget::init(QString importingDir, QWidget *wid, QString teamName)
         QTextStream in(&file);
         text = in.readAll();
     } else {
-        qDebug() << "Couldn't read file " + importingDir + this->getSection() + this->getFileToSave() + ".txt";
+        text = "";
     }
     file.close();
     if (text.compare(teamName) == 0) {

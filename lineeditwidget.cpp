@@ -12,7 +12,7 @@ void LineEditWidget::init(QString importingDir, QWidget *wid, QString extension)
         text = in.readAll();
         lineEdit->setText(text);
     } else {
-        qDebug() << "Couldn't read file " + importingDir + this->getSection() + this->getFileToSave();
+        qDebug() << "No file to initialize " + importingDir + this->getSection() + this->getFileToSave();
     }
     file.close();
 }
@@ -29,9 +29,12 @@ void LineEditWidget::saveWithImage(QString importingDir, QWidget *wid, QString l
     QString copyTo = importingDir + this->getSection() + this->getFileToSave();
     QString nameToSave = local + "/" + widget->text();
     nameToSave = this->findImageWithExtension(nameToSave);
-    this->copyFile(nameToSave, copyTo);
-    QFileInfo path(nameToSave);
-    nameToSave = path.baseName();
-    this->writeInFile(copyTo + ".txt", nameToSave);
+    if (!nameToSave.isEmpty()) {
+        this->copyFile(nameToSave, copyTo);
+        QFileInfo path(nameToSave);
+        nameToSave = path.baseName();
+        this->writeInFile(copyTo + ".txt", nameToSave);
+    }
+    this->writeInFile(copyTo + ".txt", widget->text());
 }
 

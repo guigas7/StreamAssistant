@@ -36,6 +36,22 @@ void ComboBoxWidget::init(QString importingDir, QWidget *wid, QStringList list)
     file.close();
 }
 
+void ComboBoxWidget::init(QString importingDir, QWidget *wid, QStringList list, QString filename)
+{
+    QComboBox *comboBox = (QComboBox *)wid;
+    QFile file(filename);
+    QString text;
+    comboBox->addItems(list);
+    if (file.open(QFile::ReadOnly | QFile::Text)) {
+        QTextStream in(&file);
+        text = in.readAll();
+        comboBox->setCurrentText(text);
+    } else {
+        qDebug() << "Couldn't read file " + importingDir + this->getSection() + this->getFileToSave() + ".txt";
+    }
+    file.close();
+}
+
 void ComboBoxWidget::saveInFile(QString importingDir, QWidget *wid)
 {
     QComboBox *widget = (QComboBox *) wid;
@@ -50,7 +66,7 @@ void ComboBoxWidget::saveContentInFile(QString importingDir, QWidget *wid)
     this->writeInFile(copyTo + ".txt", nameToSave);
 }
 
-void ComboBoxWidget::saveInFile(QString importingDir, QWidget *wid, QString mode, QString local)
+void ComboBoxWidget::saveInFile(QString importingDir, QWidget *wid, QString mode, QString local, QString refresh)
 {
     QComboBox *widget = (QComboBox *) wid;
     QString copyTo = importingDir + this->getSection() + this->getFileToSave();
@@ -58,6 +74,9 @@ void ComboBoxWidget::saveInFile(QString importingDir, QWidget *wid, QString mode
     if (mode.compare("image") == 0) {
         nameToSave = this->findImageWithExtension(nameToSave);
         this->copyFile(nameToSave, copyTo);
+        if (!refresh.isEmpty()) {
+            this->updateFileTimestamp(copyTo);
+        }
     }
     QFileInfo path(nameToSave);
     nameToSave = path.baseName();
@@ -81,51 +100,84 @@ QStringList ComboBoxWidget::getListOf(QString dirString)
     return noExtensionList;
 }
 
-void ComboBoxWidget::saveColor(QString colorDir, QString color, QString dirToSave, QString fileToSave, QLabel *logo)
+bool ComboBoxWidget::handleColorFile(QString colorFile, QString savingFile, QLabel *logo, bool &showedInAssistant, bool mirrored)
 {
-    QString colorFile;
-    QString savingFile;
-    bool showedInAssistant = false;
-    // for colors on colorDir
-    colorFile = this->findImageWithExtension(colorDir + color);
-    savingFile = dirToSave + fileToSave;
+    bool saved = false;
     if (QFile::exists(colorFile)) {
-        this->copyFile(colorFile, savingFile);
-        this->ignoreAspectInLabel(colorFile, logo, savingFile);
-        showedInAssistant = true;
+        if (!mirrored) {
+            this->copyFile(colorFile, savingFile);
+        } else {
+            QImage toCopy(colorFile);
+            toCopy.mirror(1,1);
+            toCopy.save(savingFile + ".png", nullptr, 100);
+            this->copyFile(savingFile + ".png", savingFile);
+            QFile::remove(savingFile + ".png");
+        }
+        if (!showedInAssistant) {
+            this->ignoreAspectInLabel(colorFile, logo, mirrored);
+            showedInAssistant = true;
+        }
+        saved = true;
     } else {
         QFile importingColor(savingFile);
         importingColor.remove();
     }
-    // for colors on //colorDir's subdirectories
-    QDir directory(colorDir);
-    QStringList dirList = directory.entryList(QDir::Dirs);
-    dirList.removeFirst(); // Take .
-    dirList.removeFirst(); // Take ..
-    for (int i = 0; i < dirList.size(); ++i) {
-        colorFile = this->findImageWithExtension(colorDir + dirList.at(i) + "/" + color);
-        savingFile = dirToSave + dirList.at(i) + "_" + fileToSave;
-        // creates dir to save if there isn't one
-        if (QFile::exists(colorFile)) {
-            this->copyFile(colorFile, savingFile);
-            if (!showedInAssistant) {
-                this->ignoreAspectInLabel(colorFile, logo, savingFile);
-                showedInAssistant = true;
-            }
-        } else {
-            QFile importingColor(savingFile);
-            importingColor.remove();
-        }
-    }
+    return saved;
 }
 
-void ComboBoxWidget::saveColors(QString importingDir, QWidget *wid, QString local, QLabel *alphaLabel, QLabel *betaLabel, QLabel *comboLabel)
+bool ComboBoxWidget::saveColor(QString colorDir, QString color, QString dirToSave, QString fileToSave, QLabel *logo, bool mirrored)
+{
+    QString colorFile;
+    QString savingFile;
+    bool saved = false;
+    bool showedInAssistant = false;
+    // for colors on colorDir
+    colorFile = this->findImageWithExtension(colorDir + color);
+    savingFile = dirToSave + fileToSave;
+    saved = handleColorFile(colorFile, savingFile, logo, showedInAssistant, mirrored);
+    // for colors on //colorDir's subdirectories
+    QDir directory(colorDir);
+    if (directory.exists()) {
+        QStringList dirList = directory.entryList(QDir::Dirs);
+        dirList.removeFirst(); // Take .
+        dirList.removeFirst(); // Take ..
+        for (int i = 0; i < dirList.size(); ++i) {
+            colorFile = this->findImageWithExtension(colorDir + dirList.at(i) + "/" + color);
+            savingFile = dirToSave + dirList.at(i) + "_" + fileToSave;
+            saved = handleColorFile(colorFile, savingFile, logo, showedInAssistant, mirrored);
+        }
+    }
+    return saved;
+}
+
+void ComboBoxWidget::saveColors(QString importingDir, QWidget *wid, QString local, QLabel *alphaLabel, QLabel *betaLabel, QLabel *comboLabel, bool mirrored)
 {
     QComboBox *widget = (QComboBox *) wid;
     QString color = widget->currentText();
-
-    this->saveColor(local + "/alpha/", color, importingDir + "/teamAlpha/", this->getFileToSave(), alphaLabel);
-    this->saveColor(local + "/beta/", color, importingDir + "/teamBeta/", this->getFileToSave(), betaLabel);
-    this->saveColor(local + "/combo/", color, importingDir + this->getSection(), this->getFileToSave() + "s", comboLabel);
+    QString colorNameFile = importingDir + this->getSection() + this->getFileToSave() + ".txt";
+    bool savedColorName = false;
+    QString alphaImportingDir = mirrored ? importingDir + "/teamBeta/" : importingDir + "/teamAlpha/";
+    QString betaImportingDir = mirrored ? importingDir + "/teamAlpha/" : importingDir + "/teamBeta/";
+    if(this->saveColor(local + "/alpha/", color, alphaImportingDir, this->getFileToSave(), mirrored ? betaLabel : alphaLabel)) {
+        writeInFile(colorNameFile, color);
+        savedColorName = true;
+    }
+    if (this->saveColor(local + "/beta/", color, betaImportingDir, this->getFileToSave(), mirrored ? alphaLabel : betaLabel)) {
+        if (!savedColorName) {
+            writeInFile(colorNameFile, color);
+            savedColorName = true;
+        }
+    }
+    if (this->saveColor(local + "/combo/", color, importingDir + this->getSection(), this->getFileToSave() + "s", comboLabel, mirrored) && !savedColorName)
+    {
+        if (!savedColorName) {
+            writeInFile(colorNameFile, color);
+            savedColorName = true;
+        }
+    }
+    if (!savedColorName) {
+        QFile::remove(colorNameFile);
+    }
     return;
 }
+

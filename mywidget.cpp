@@ -53,6 +53,11 @@ void MyWidget::writeInFile(QString filename, QString text)
 
 QString MyWidget::findImageWithExtension(QString filename)
 {
+    qDebug() << "finding image with extension";
+    if (filename.last(1) == "/") {
+        qDebug() << "entrou e é " + filename;
+        return "";
+    }
     if (QFile::exists(filename + ".png")) {
         return filename + ".png";
     } else if (QFile::exists(filename + ".jpg")) {
@@ -60,7 +65,7 @@ QString MyWidget::findImageWithExtension(QString filename)
     } else if (QFile::exists(filename)) {
         return filename;
     }
-    qDebug() << filename + " not found!";
+    // qDebug() << filename + " not found!";
     return "";
 }
 
@@ -91,26 +96,48 @@ QString MyWidget::getRandomImageName(QString defaultDir)
     return "Nenhuma imagem padrão para escolher";
 }
 
-void MyWidget::showImageInLabel(QString imageName, QLabel *logo, QString copyName, Qt::AspectRatioMode aspectRatioMode)
+void MyWidget::showImageInLabel(QString imageName, QLabel *logo, Qt::AspectRatioMode aspectRatioMode, bool mirrored)
 {
     QImage image;
     bool valid = image.load(imageName);
     if (valid) {
         image = image.scaled(logo->width(), logo->height(), aspectRatioMode, Qt::SmoothTransformation);
+        if (mirrored) {
+            image.mirror(1, 1);
+        }
         logo->setPixmap(QPixmap::fromImage(image));
     } else {
         qDebug() << "couldn't load image " + imageName;
     }
 }
 
-void MyWidget::ignoreAspectInLabel(QString imageName, QLabel *logo, QString copyName)
+void MyWidget::ignoreAspectInLabel(QString imageName, QLabel *logo, bool mirrored)
 {
-    showImageInLabel(imageName, logo, copyName, Qt::IgnoreAspectRatio);
+    if (mirrored) {
+        showImageInLabel(imageName, logo, Qt::IgnoreAspectRatio, mirrored);
+    } else {
+        showImageInLabel(imageName, logo, Qt::IgnoreAspectRatio);
+    }
 }
 
-void MyWidget::keepAspectInLabel(QString imageName, QLabel *logo, QString copyName)
+void MyWidget::keepAspectInLabel(QString imageName, QLabel *logo, bool mirrored)
 {
-    showImageInLabel(imageName, logo, copyName, Qt::KeepAspectRatio);
+    if (mirrored) {
+        showImageInLabel(imageName, logo, Qt::KeepAspectRatio, mirrored);
+    } else {
+        showImageInLabel(imageName, logo, Qt::KeepAspectRatio);
+    }
 }
 
-
+void MyWidget::updateFileTimestamp(QString filePath)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadWrite)) {
+        return;
+    }
+    const quint64 size = file.size();
+    file.seek(size);
+    file.write( QByteArray(1, '0') );
+    file.resize(size);
+    return;
+}

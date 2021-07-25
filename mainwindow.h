@@ -100,19 +100,24 @@ private slots:
     void on_BetaWinGame8_clicked();
     void on_BetaWinGame9_clicked();
     void on_actionSet_Directories_triggered();
+    void on_actionUpdate_Options_triggered();
     void on_UpdateScoreCheckbox_stateChanged(int arg1);
     void on_UpdateRoundCheckbox_stateChanged(int arg1);
     void on_ColorsCombo_activated(int index);
+    void on_SwapColorsButton_clicked();
+    void on_SwapTeamsButton_clicked();
+    void on_FilesDialogAccepted();
+    void closeEvent(QCloseEvent *event);
 
 private:
     Ui::MainWindow *ui;
-    FilesDialog *dirConfigWindow;
     void configDirectories_init();
     void infoSection_init();
-    void TeamsSection_init();
-    void RoundSection_init();
-    void CastersSection_init();
-    void SetSection_init();
+    void teamsSection_init();
+    void roundSection_init();
+    void castersSection_init();
+    void setSection_init();
+    void colors_init();
     QMap<QString, MyWidget*> widgets_init();
     QStringList getListOf(QString dirIndex);
     void writeInFile(QString filename, QString text);
@@ -120,6 +125,8 @@ private:
     void deserialize(const char *, void *, int);
     void scoreAutoUpdate(QSpinBox *teamScore, QCheckBox *teamCheckBox);
     void roundAutoUpdate();
+    void resetFields();
+    QString getColorsLocal();
     QCompleter *Team1Completer;
     QCompleter *Team2Completer;
     QCompleter *regionCompleter;
@@ -127,6 +134,7 @@ private:
     QMap<QString, QString> directoryFor;
     QMap<QString, MyWidget *> widgetFor;
     QString directories[dirAmount];
+    bool mirrored;
 };
 
 #endif // MAINWINDOW_H

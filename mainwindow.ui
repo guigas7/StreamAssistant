@@ -341,16 +341,16 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="SwapPlayersButton">
+       <widget class="QPushButton" name="SwapTeamsButton">
         <property name="text">
-         <string>Swap Players</string>
+         <string>Swap Teams</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="SwapColorsButton">
         <property name="text">
-         <string>Swap Colors</string>
+         <string>Reverse Colors</string>
         </property>
        </widget>
       </item>
@@ -507,6 +507,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -525,6 +528,9 @@
           <width>161</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
         </property>
        </widget>
       </item>
@@ -568,6 +574,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -592,6 +601,9 @@
           <width>16</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
         </property>
         <property name="text">
          <string/>
@@ -654,6 +666,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -678,6 +693,9 @@
           <width>16</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
         </property>
         <property name="text">
          <string/>
@@ -740,6 +758,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -764,6 +785,9 @@
           <width>16</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
         </property>
         <property name="text">
          <string/>
@@ -826,6 +850,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -850,6 +877,9 @@
           <width>16</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
         </property>
         <property name="text">
          <string/>
@@ -912,6 +942,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -936,6 +969,9 @@
           <width>16</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
         </property>
         <property name="text">
          <string/>
@@ -998,6 +1034,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -1022,6 +1061,9 @@
           <width>16</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
         </property>
         <property name="text">
          <string/>
@@ -1084,6 +1126,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -1108,6 +1153,9 @@
           <width>16</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
         </property>
         <property name="text">
          <string/>
@@ -1170,6 +1218,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -1194,6 +1245,9 @@
           <width>16</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
         </property>
         <property name="text">
          <string/>
@@ -1255,6 +1309,9 @@
           <width>16</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
         </property>
         <property name="text">
          <string/>
@@ -1572,6 +1629,7 @@
      <string>Settings</string>
     </property>
     <addaction name="actionSet_Directories"/>
+    <addaction name="actionUpdate_Options"/>
    </widget>
    <addaction name="menuTest"/>
   </widget>
@@ -1583,6 +1641,11 @@
   <action name="actionSet_Directories">
    <property name="text">
     <string>Set Directories</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Options">
+   <property name="text">
+    <string>Update Options</string>
    </property>
   </action>
  </widget>

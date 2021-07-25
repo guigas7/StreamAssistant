@@ -25,9 +25,10 @@ public:
     QString findImageWithExtension(QString filename);
     void copyFile(QString source, QString destiny);
     QString getRandomImageName(QString defaultDir);
-    void showImageInLabel(QString imageName, QLabel *logo, QString copyName, Qt::AspectRatioMode);
-    void ignoreAspectInLabel(QString imageName, QLabel *logo, QString copyName);
-    void keepAspectInLabel(QString imageName, QLabel *logo, QString copyName);
+    void showImageInLabel(QString imageName, QLabel *logo, Qt::AspectRatioMode, bool mirrored = false);
+    void ignoreAspectInLabel(QString imageName, QLabel *logo, bool mirrored = false);
+    void keepAspectInLabel(QString imageName, QLabel *logo, bool mirrored = false);
+    void updateFileTimestamp(QString filePath);
     virtual ~MyWidget();
 
 private:
