@@ -35,7 +35,7 @@ Feel free to add issues in here as i plan to keep adding more Feature and qol ch
 
 # Planned Releases
 
-### V1.5 - Planned for September
+### V1.5 - Planned for October
 
 - Support for more image file types
 - Linux and MAC version
