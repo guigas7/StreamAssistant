@@ -12,6 +12,8 @@ Getting Started
 - Launch the aplication with the executable StreamAssistant.exe
 - Make sure you have the right directories set up:
 
+In the first time you open the application, go for Settings -> set directories and just save the default ones.
+
 In the config directory you have all the folders to add more stuff and also all the files you need to import as OBS sources!
 
 On the Colors directory you can add colors for Ranked, Splatfest and Turf War
@@ -33,7 +35,7 @@ Feel free to add issues in here as i plan to keep adding more Feature and qol ch
 
 # Planned Releases
 
-### V1.5 - Planned for September
+### V1.5 - Planned for October
 
 - Support for more image file types
 - Linux and MAC version
