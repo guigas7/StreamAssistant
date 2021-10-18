@@ -6,7 +6,7 @@
 #include <QLineEdit>
 #include <QMap>
 
-#define dirAmount 11
+#define dirAmount 12
 
 namespace Ui {
 class FilesDialog;
@@ -35,6 +35,7 @@ private slots:
     void on_RankedColorsDirectoryHelp_clicked();
     void on_ImportingFilesDirectoryHelp_clicked();
     void on_DefaultDirectoryHelp_clicked();
+    void on_WinPointsDirectoryHelp_clicked();
     void on_AlphaTeamDirectoryFind_clicked();
     void on_BetaTeamDirectoryFind_clicked();
     void on_RegionsDirectoryFind_clicked();
@@ -46,6 +47,7 @@ private slots:
     void on_RankedColorsDirectoryFind_clicked();
     void on_ImportingFilesDirectoryFind_clicked();
     void on_DefaultDirectoryFind_clicked();
+    void on_WinPointsDirectoryFind_clicked();
     void on_DirectoriesDialogButtonBox_accepted();
 
 private:

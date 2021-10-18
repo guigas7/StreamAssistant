@@ -17,10 +17,13 @@ void LineEditWidget::init(QString importingDir, QWidget *wid, QString extension)
     file.close();
 }
 
-void LineEditWidget::saveInFile(QString importingDir, QWidget *wid)
+void LineEditWidget::saveInFile(QString importingDir, QWidget *wid, QString section, QString fileToSave, QString content)
 {
     QLineEdit *widget = (QLineEdit *) wid;
-    this->writeInFile(importingDir + this->getSection() + this->getFileToSave(), widget->text());
+    QString sec = (section.isEmpty() ? this->getSection() : section);
+    QString fts = (fileToSave.isEmpty() ? this->getFileToSave() : fileToSave);
+    QString cont = (content.isEmpty() ? widget->text() : content);
+    this->writeInFile(importingDir + sec + fts, cont);
 }
 
 void LineEditWidget::saveWithImage(QString importingDir, QWidget *wid, QString local)

@@ -141,11 +141,32 @@
       </item>
      </layout>
     </widget>
+    <widget class="QSpinBox" name="Team1Score">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>120</y>
+       <width>111</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>28</pointsize>
+      </font>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="TeamBetaGroupBox">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>500</x>
       <y>0</y>
       <width>281</width>
       <height>171</height>
@@ -264,13 +285,40 @@
       </item>
      </layout>
     </widget>
+    <widget class="QSpinBox" name="Team2Score">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>119</y>
+       <width>111</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>26</pointsize>
+      </font>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
+     <property name="wrapping">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="Round_Group_Box">
     <property name="geometry">
      <rect>
       <x>290</x>
       <y>10</y>
-      <width>151</width>
+      <width>211</width>
       <height>321</height>
      </rect>
     </property>
@@ -281,9 +329,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>10</y>
-       <width>131</width>
-       <height>298</height>
+       <y>0</y>
+       <width>191</width>
+       <height>311</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -301,12 +349,40 @@
        <widget class="QLineEdit" name="RoundEdit"/>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QSpinBox" name="Team1Score"/>
+         <layout class="QVBoxLayout" name="verticalLayout_6">
+          <item>
+           <widget class="QCheckBox" name="UpdateScoreCheckbox">
+            <property name="text">
+             <string>Auto Update Score</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="UpdateRoundCheckbox">
+            <property name="text">
+             <string>Auto Update Round</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="UpdateColorCheckbox">
+            <property name="text">
+             <string>Auto Update Colors</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
          <widget class="QLabel" name="BothTeamsColor">
+          <property name="maximumSize">
+           <size>
+            <width>31</width>
+            <height>65</height>
+           </size>
+          </property>
           <property name="layoutDirection">
            <enum>Qt::LeftToRight</enum>
           </property>
@@ -318,16 +394,6 @@
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QSpinBox" name="Team2Score">
-          <property name="layoutDirection">
-           <enum>Qt::RightToLeft</enum>
-          </property>
-          <property name="wrapping">
-           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -380,29 +446,15 @@
       <item>
        <widget class="QComboBox" name="ColorsCombo"/>
       </item>
-      <item>
-       <widget class="QCheckBox" name="UpdateRoundCheckbox">
-        <property name="text">
-         <string>Auto Update Round</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="UpdateScoreCheckbox">
-        <property name="text">
-         <string>Auto Update Score</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </widget>
    <widget class="QGroupBox" name="SetGroupBox">
     <property name="geometry">
      <rect>
-      <x>730</x>
+      <x>779</x>
       <y>0</y>
-      <width>471</width>
+      <width>491</width>
       <height>331</height>
      </rect>
     </property>
@@ -494,7 +546,7 @@
       <rect>
        <x>10</x>
        <y>50</y>
-       <width>451</width>
+       <width>471</width>
        <height>22</height>
       </rect>
      </property>
@@ -554,7 +606,7 @@
        <widget class="QComboBox" name="ModeComboGame1">
         <property name="minimumSize">
          <size>
-          <width>110</width>
+          <width>130</width>
           <height>20</height>
          </size>
         </property>
@@ -589,7 +641,7 @@
       <rect>
        <x>10</x>
        <y>80</y>
-       <width>451</width>
+       <width>471</width>
        <height>22</height>
       </rect>
      </property>
@@ -646,7 +698,7 @@
        <widget class="QComboBox" name="ModeComboGame2">
         <property name="minimumSize">
          <size>
-          <width>110</width>
+          <width>130</width>
           <height>20</height>
          </size>
         </property>
@@ -681,7 +733,7 @@
       <rect>
        <x>10</x>
        <y>110</y>
-       <width>451</width>
+       <width>471</width>
        <height>22</height>
       </rect>
      </property>
@@ -738,7 +790,7 @@
        <widget class="QComboBox" name="ModeComboGame3">
         <property name="minimumSize">
          <size>
-          <width>110</width>
+          <width>130</width>
           <height>20</height>
          </size>
         </property>
@@ -773,7 +825,7 @@
       <rect>
        <x>10</x>
        <y>140</y>
-       <width>451</width>
+       <width>471</width>
        <height>22</height>
       </rect>
      </property>
@@ -830,7 +882,7 @@
        <widget class="QComboBox" name="ModeComboGame4">
         <property name="minimumSize">
          <size>
-          <width>110</width>
+          <width>130</width>
           <height>20</height>
          </size>
         </property>
@@ -865,7 +917,7 @@
       <rect>
        <x>10</x>
        <y>170</y>
-       <width>451</width>
+       <width>471</width>
        <height>22</height>
       </rect>
      </property>
@@ -922,7 +974,7 @@
        <widget class="QComboBox" name="ModeComboGame5">
         <property name="minimumSize">
          <size>
-          <width>110</width>
+          <width>130</width>
           <height>20</height>
          </size>
         </property>
@@ -957,7 +1009,7 @@
       <rect>
        <x>10</x>
        <y>200</y>
-       <width>451</width>
+       <width>471</width>
        <height>22</height>
       </rect>
      </property>
@@ -1014,7 +1066,7 @@
        <widget class="QComboBox" name="ModeComboGame6">
         <property name="minimumSize">
          <size>
-          <width>110</width>
+          <width>130</width>
           <height>20</height>
          </size>
         </property>
@@ -1049,7 +1101,7 @@
       <rect>
        <x>10</x>
        <y>230</y>
-       <width>451</width>
+       <width>471</width>
        <height>22</height>
       </rect>
      </property>
@@ -1106,7 +1158,7 @@
        <widget class="QComboBox" name="ModeComboGame7">
         <property name="minimumSize">
          <size>
-          <width>110</width>
+          <width>130</width>
           <height>20</height>
          </size>
         </property>
@@ -1141,7 +1193,7 @@
       <rect>
        <x>10</x>
        <y>260</y>
-       <width>451</width>
+       <width>471</width>
        <height>22</height>
       </rect>
      </property>
@@ -1198,7 +1250,7 @@
        <widget class="QComboBox" name="ModeComboGame8">
         <property name="minimumSize">
          <size>
-          <width>110</width>
+          <width>130</width>
           <height>20</height>
          </size>
         </property>
@@ -1233,7 +1285,7 @@
       <rect>
        <x>10</x>
        <y>290</y>
-       <width>451</width>
+       <width>471</width>
        <height>22</height>
       </rect>
      </property>
@@ -1290,7 +1342,7 @@
        <widget class="QComboBox" name="ModeComboGame9">
         <property name="minimumSize">
          <size>
-          <width>110</width>
+          <width>130</width>
           <height>20</height>
          </size>
         </property>
@@ -1324,7 +1376,7 @@
    <widget class="QGroupBox" name="CastersGroupbox">
     <property name="geometry">
      <rect>
-      <x>439</x>
+      <x>499</x>
       <y>169</y>
       <width>281</width>
       <height>161</height>
@@ -1649,6 +1701,59 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>Team1NameEdit</tabstop>
+  <tabstop>Team2NameEdit</tabstop>
+  <tabstop>Team1Score</tabstop>
+  <tabstop>Team2Score</tabstop>
+  <tabstop>RoundEdit</tabstop>
+  <tabstop>MapComboGame1</tabstop>
+  <tabstop>MapComboGame2</tabstop>
+  <tabstop>ModeComboGame2</tabstop>
+  <tabstop>MapComboGame3</tabstop>
+  <tabstop>ModeComboGame3</tabstop>
+  <tabstop>MapComboGame4</tabstop>
+  <tabstop>ModeComboGame4</tabstop>
+  <tabstop>MapComboGame5</tabstop>
+  <tabstop>ModeComboGame5</tabstop>
+  <tabstop>MapComboGame6</tabstop>
+  <tabstop>ModeComboGame6</tabstop>
+  <tabstop>MapComboGame7</tabstop>
+  <tabstop>ModeComboGame7</tabstop>
+  <tabstop>MapComboGame8</tabstop>
+  <tabstop>ModeComboGame8</tabstop>
+  <tabstop>MapComboGame9</tabstop>
+  <tabstop>ModeComboGame9</tabstop>
+  <tabstop>Team1RegionCombo</tabstop>
+  <tabstop>Team2RegionCombo</tabstop>
+  <tabstop>UpdateScoreCheckbox</tabstop>
+  <tabstop>UpdateRoundCheckbox</tabstop>
+  <tabstop>UpdateColorCheckbox</tabstop>
+  <tabstop>ResetScoresButton</tabstop>
+  <tabstop>SwapTeamsButton</tabstop>
+  <tabstop>SwapColorsButton</tabstop>
+  <tabstop>TitleEdit</tabstop>
+  <tabstop>SubtitleEdit</tabstop>
+  <tabstop>TwitterEdit</tabstop>
+  <tabstop>MessageEdit</tabstop>
+  <tabstop>LogoCombo</tabstop>
+  <tabstop>Caster1NameEdit</tabstop>
+  <tabstop>Caster2NameEdit</tabstop>
+  <tabstop>Caster3NameEdit</tabstop>
+  <tabstop>Caster1TwitterEdit</tabstop>
+  <tabstop>Caster2TwitterEdit</tabstop>
+  <tabstop>Caster3TwitterEdit</tabstop>
+  <tabstop>ColorGroupCombo</tabstop>
+  <tabstop>RadioGame1</tabstop>
+  <tabstop>RadioGame2</tabstop>
+  <tabstop>RadioGame3</tabstop>
+  <tabstop>RadioGame4</tabstop>
+  <tabstop>RadioGame5</tabstop>
+  <tabstop>RadioGame6</tabstop>
+  <tabstop>RadioGame7</tabstop>
+  <tabstop>RadioGame8</tabstop>
+  <tabstop>RadioGame9</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
  <buttongroups>

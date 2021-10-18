@@ -22,6 +22,7 @@ FilesDialog::~FilesDialog()
 void FilesDialog::makeDefaultDir(QLineEdit *field, QString configFile, QString configDir)
 {
     QString dirName;
+    QStringList subDirList;
     if (configFile.compare("/AlphaTeamDirectory.txt") == 0) {
         dirName = configDir + "/TeamsDirectory";
     } else if (configFile.compare("/BetaTeamDirectory.txt") == 0) {
@@ -36,17 +37,34 @@ void FilesDialog::makeDefaultDir(QLineEdit *field, QString configFile, QString c
         dirName = configDir + "/ModeIconsDirectory";
     } else if (configFile.compare("/SplatfestColorsDirectory.txt") == 0) {
         dirName = configDir + "/Colors/SplatfestColorsDirectory";
+        QDir().mkdir(configDir + "/Colors");
+        subDirList << dirName + "/alpha" << dirName + "/beta" << dirName + "/combo";
     } else if (configFile.compare("/RankedColorsDirectory.txt") == 0) {
         dirName = configDir + "/Colors/RankedColorsDirectory";
+        QDir().mkdir(configDir + "/Colors");
+        subDirList << dirName + "/alpha" << dirName + "/beta" << dirName + "/combo";
     } else if (configFile.compare("/TurfWarColorsDirectory.txt") == 0) {
         dirName = configDir + "/Colors/Turf WarColorsDirectory";
+        QDir().mkdir(configDir + "/Colors");
+        subDirList << dirName + "/alpha" << dirName + "/beta" << dirName + "/combo";
     } else if (configFile.compare("/ImportingFilesDirectory.txt") == 0) {
         dirName = configDir + "/ImportingFilesDirectory";
+        subDirList << dirName + "/casters" << dirName + "/info" << dirName + "/round";
+        subDirList << dirName + "/set" << dirName + "/teamAlpha" << dirName + "/teamBeta";
+        subDirList << dirName + "/set/maps" << dirName + "/set/modes";
+        subDirList << dirName + "/set/winners" << dirName + "/set/winPoints";
     } else if (configFile.compare("/DefaultDirectory.txt") == 0) {
         dirName = configDir + "/DefaultDirectory";
+        subDirList << dirName + "/logo";
+    } else if (configFile.compare("/WinPointsDirectory.txt") == 0) {
+        dirName = configDir + "/WinPointsDirectory";
+        subDirList << dirName + "/teamAlpha" << dirName + "/teamBeta";
     }
     field->setText(dirName);
     QDir().mkdir(dirName); // Make sure default dir exists
+    for (int i = 0; i < subDirList.size(); ++i) {
+        QDir().mkdir(subDirList.at(i));
+    }
     saveConfigDirectory(configDir + configFile, field); // Save default dir in config File
 }
 
@@ -57,7 +75,7 @@ void FilesDialog::directories_init(QString *dirs)
     QLineEdit *widgets[dirAmount] {
         ui->AlphaTeamDirectoryEdit, ui->BetaTeamDirectoryEdit, ui->RegionsDirectoryEdit, ui->LogosDirectoryEdit,
         ui->MapsDirectoryEdit, ui->ModeIconsDirectoryEdit, ui->SplatfestColorsDirectoryEdit, ui->TurfWarColorsDirectoryEdit,
-        ui->RankedColorsDirectoryEdit, ui->ImportingFilesDirectoryEdit, ui->DefaultDirectoryEdit
+        ui->RankedColorsDirectoryEdit, ui->ImportingFilesDirectoryEdit, ui->DefaultDirectoryEdit, ui->WinPointsDirectoryEdit
     };
     for (int i = 0; i < dirAmount; i++) {
         this->fields[i] = widgets[i];
@@ -71,7 +89,7 @@ void FilesDialog::directories_init(QString *dirs)
     QString text;
     bool makeDefault = false;
     // for each field
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < dirAmount; i++) {
         filename = directory + this->directories[i];
         file.setFileName(filename);
         // if no saved location create and save location for default
@@ -191,12 +209,17 @@ void FilesDialog::on_DefaultDirectoryHelp_clicked()
     QMessageBox::information(this, "Default Directory", "This Directory will contain the default images for teams that don't have logos (or when you didn't save it).\n\nBy putting an image here (with any name) it will be used as the default team logo.\n\nYou can also place a bunch of default images in here and the scoreboard will pick one at random each time you enter a team without a saved logo.");
 }
 
+void FilesDialog::on_WinPointsDirectoryHelp_clicked()
+{
+    QMessageBox::information(this, "Win Points Directory", "This Directory will contain the default images for win points that will be assigned depending on the winner of each game.\n\nYou can set as many win points you want for alpha an for beta, and they'll all be assigned on each winner on the importingDirectory/set/winpoints.");
+}
+
 void FilesDialog::on_AlphaTeamDirectoryFind_clicked()
 {
     QString alphaTeamDirectory = QFileDialog::getExistingDirectory(
         this,
         tr("Open the Alpha team directory"),
-        QDir::currentPath() + "/config",
+        QCoreApplication::applicationDirPath() + "/config",
         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
     );
     if (alphaTeamDirectory.length() != 0) {
@@ -209,7 +232,7 @@ void FilesDialog::on_BetaTeamDirectoryFind_clicked()
     QString betaTeamDirectory = QFileDialog::getExistingDirectory(
         this,
         tr("Open the Beta team directory"),
-        QDir::currentPath() + "/config",
+        QCoreApplication::applicationDirPath() + "/config",
         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
     );
     if (betaTeamDirectory.length() != 0) {
@@ -222,7 +245,7 @@ void FilesDialog::on_RegionsDirectoryFind_clicked()
     QString regionsDirectory = QFileDialog::getExistingDirectory(
         this,
         tr("Open the region directory"),
-        QDir::currentPath() + "/config",
+        QCoreApplication::applicationDirPath() + "/config",
         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
     );
     if (regionsDirectory.length() != 0) {
@@ -235,7 +258,7 @@ void FilesDialog::on_LogosDirectoryFind_clicked()
     QString logosDirectory = QFileDialog::getExistingDirectory(
         this,
         tr("Open the logos directory"),
-        QDir::currentPath() + "/config",
+        QCoreApplication::applicationDirPath() + "/config",
         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
     );
     if (logosDirectory.length() != 0) {
@@ -249,7 +272,7 @@ void FilesDialog::on_MapsDirectoryFind_clicked()
     QString mapsDirectory = QFileDialog::getExistingDirectory(
         this,
         tr("Open the maps directory"),
-        QDir::currentPath() + "/config",
+        QCoreApplication::applicationDirPath() + "/config",
         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
     );
     if (mapsDirectory.length() != 0) {
@@ -263,7 +286,7 @@ void FilesDialog::on_ModeIconsDirectoryFind_clicked()
     QString modeIconsDirectory = QFileDialog::getExistingDirectory(
         this,
         tr("Open the mode icons directory"),
-        QDir::currentPath() + "/config",
+        QCoreApplication::applicationDirPath() + "/config",
         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
     );
     if (modeIconsDirectory.length() != 0) {
@@ -276,7 +299,7 @@ void FilesDialog::on_SplatfestColorsDirectoryFind_clicked()
     QString splatfestColorsDirectory = QFileDialog::getExistingDirectory(
         this,
         tr("Open the Splatfest colors directory"),
-        QDir::currentPath() + "/config",
+        QCoreApplication::applicationDirPath() + "/config",
         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
     );
     if (splatfestColorsDirectory.length() != 0) {
@@ -289,7 +312,7 @@ void FilesDialog::on_TurfWarColorsDirectoryFind_clicked()
     QString turfWarColorsDirectory = QFileDialog::getExistingDirectory(
         this,
         tr("Open the Turf War Colors directory"),
-        QDir::currentPath() + "/config",
+        QCoreApplication::applicationDirPath() + "/config",
         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
     );
     if (turfWarColorsDirectory.length() != 0) {
@@ -302,7 +325,7 @@ void FilesDialog::on_RankedColorsDirectoryFind_clicked()
     QString rankedColorsDirectory = QFileDialog::getExistingDirectory(
         this,
         tr("Open the ranked colors directory"),
-        QDir::currentPath() + "/config",
+        QCoreApplication::applicationDirPath() + "/config",
         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
     );
     if (rankedColorsDirectory.length() != 0) {
@@ -315,7 +338,7 @@ void FilesDialog::on_ImportingFilesDirectoryFind_clicked()
     QString importingFilesDirectory = QFileDialog::getExistingDirectory(
         this,
         tr("Open the importing files directory"),
-        QDir::currentPath() + "/config",
+        QCoreApplication::applicationDirPath() + "/config",
         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
     );
     if (importingFilesDirectory.length() != 0) {
@@ -323,16 +346,28 @@ void FilesDialog::on_ImportingFilesDirectoryFind_clicked()
     }
 }
 
-
 void FilesDialog::on_DefaultDirectoryFind_clicked()
 {
     QString defaultDirectory = QFileDialog::getExistingDirectory(
         this,
         tr("Open the Default directory"),
-        QDir::currentPath() + "/config",
+        QCoreApplication::applicationDirPath() + "/config",
         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
     );
     if (defaultDirectory.length() != 0) {
         ui->DefaultDirectoryEdit->setText(defaultDirectory);
+    }
+}
+
+void FilesDialog::on_WinPointsDirectoryFind_clicked()
+{
+    QString winPointDirectory = QFileDialog::getExistingDirectory(
+        this,
+        tr("Open the Win Points directory"),
+        QCoreApplication::applicationDirPath() + "/config",
+        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
+    );
+    if (winPointDirectory.length() != 0) {
+        ui->DefaultDirectoryEdit->setText(winPointDirectory);
     }
 }

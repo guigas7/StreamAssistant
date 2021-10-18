@@ -8,7 +8,7 @@ class CheckBoxWidget : public MyWidget
 {
 public:
     explicit CheckBoxWidget(QString sec, QString fts);
-    void handleCheck(QString importingDir, QWidget *wid, QString teamDir);
+    void handleCheck(QString importingDir, QWidget *wid, QString teamDir, QString winPointsDir);
     void init(QString importingDir, QWidget *wid, QString teamName);
 };
 

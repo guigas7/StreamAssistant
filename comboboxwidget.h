@@ -21,7 +21,7 @@ public:
     explicit ComboBoxWidget(QString sec, QString fts);
     void saveInFile(QString importingDir, QWidget *wid);
     void saveContentInFile(QString importingDir, QWidget *wid);
-    void saveInFile(QString importingDir, QWidget *wid, QString mode, QString local, QString refresh = "");
+    void saveInFile(QString importingDir, QWidget *wid, QString mode, QString local);
     void init(QString importingDir, QWidget *wid, QString logosDir);
     void init(QString importingDir, QWidget *wid, QStringList list);
     void init(QString importingDir, QWidget *wid, QStringList list, QString filename);

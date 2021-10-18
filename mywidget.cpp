@@ -53,9 +53,7 @@ void MyWidget::writeInFile(QString filename, QString text)
 
 QString MyWidget::findImageWithExtension(QString filename)
 {
-    qDebug() << "finding image with extension";
     if (filename.last(1) == "/") {
-        qDebug() << "entrou e é " + filename;
         return "";
     }
     if (QFile::exists(filename + ".png")) {
@@ -65,7 +63,6 @@ QString MyWidget::findImageWithExtension(QString filename)
     } else if (QFile::exists(filename)) {
         return filename;
     }
-    // qDebug() << filename + " not found!";
     return "";
 }
 
@@ -73,6 +70,7 @@ void MyWidget::copyFile(QString source, QString destiny)
 {
     QFile::remove(destiny);
     QFile::copy(source, destiny);
+    updateFileTimestamp(destiny);
     return;
 }
 

@@ -4,20 +4,25 @@ ComboBoxWidget::ComboBoxWidget(QString sec, QString fts): MyWidget(sec, fts) {}
 
 void ComboBoxWidget::init(QString importingDir, QWidget *wid, QString listDir)
 {
-    QComboBox *comboBox = (QComboBox *)wid;
-    QFile file(importingDir + this->getSection() + this->getFileToSave() + ".txt");
-    QString text;
-    // init the autocomplete list TODO
-    const QStringList itemsList = this->getListOf(listDir);
-    comboBox->addItems(itemsList);
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        QTextStream in(&file);
-        text = in.readAll();
-        comboBox->setCurrentText(text);
-    } else {
-        qDebug() << "Couldn't read file " + importingDir + this->getSection() + this->getFileToSave() + ".txt";
+    if (!listDir.isEmpty()) {
+        QComboBox *comboBox = (QComboBox *)wid;
+        QFile file(importingDir + this->getSection() + this->getFileToSave() + ".txt");
+        QString text;
+        // init the autocomplete list TODO
+        const QStringList itemsList = this->getListOf(listDir);
+        comboBox->addItems(itemsList);
+        if (file.open(QFile::ReadOnly | QFile::Text)) {
+            QTextStream in(&file);
+            text = in.readAll();
+            comboBox->setCurrentText(text);
+        } else {
+            qDebug() << "Couldn't read file " + importingDir + this->getSection() + this->getFileToSave() + ".txt";
+        }
+        for (int i = 0; i < itemsList.size(); ++i) {
+            comboBox->setItemIcon(i, QIcon(listDir + "/" + itemsList.at(i)));
+        }
+        file.close();
     }
-    file.close();
 }
 
 void ComboBoxWidget::init(QString importingDir, QWidget *wid, QStringList list)
@@ -66,7 +71,7 @@ void ComboBoxWidget::saveContentInFile(QString importingDir, QWidget *wid)
     this->writeInFile(copyTo + ".txt", nameToSave);
 }
 
-void ComboBoxWidget::saveInFile(QString importingDir, QWidget *wid, QString mode, QString local, QString refresh)
+void ComboBoxWidget::saveInFile(QString importingDir, QWidget *wid, QString mode, QString local)
 {
     QComboBox *widget = (QComboBox *) wid;
     QString copyTo = importingDir + this->getSection() + this->getFileToSave();
@@ -74,9 +79,6 @@ void ComboBoxWidget::saveInFile(QString importingDir, QWidget *wid, QString mode
     if (mode.compare("image") == 0) {
         nameToSave = this->findImageWithExtension(nameToSave);
         this->copyFile(nameToSave, copyTo);
-        if (!refresh.isEmpty()) {
-            this->updateFileTimestamp(copyTo);
-        }
     }
     QFileInfo path(nameToSave);
     nameToSave = path.baseName();

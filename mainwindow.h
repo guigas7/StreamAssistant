@@ -16,6 +16,8 @@
 
 #define widAmount 69
 
+
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -27,6 +29,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    typedef void (MainWindow::*clickedFunction)(void);
 
 private slots:
     // Team Alpha Section
@@ -81,6 +84,7 @@ private slots:
     void on_RadioGame7_clicked();
     void on_RadioGame8_clicked();
     void on_RadioGame9_clicked();
+    void handleWinner(QCheckBox *WinGame, QCheckBox *OpponentWinGame, QSpinBox *score, QSpinBox *opponentScore, QString teamDir, QRadioButton *round, QRadioButton *nextGame, clickedFunction nextGameClicked);
     void on_AlphaWinGame1_clicked();
     void on_AlphaWinGame2_clicked();
     void on_AlphaWinGame3_clicked();
@@ -107,6 +111,8 @@ private slots:
     void on_SwapColorsButton_clicked();
     void on_SwapTeamsButton_clicked();
     void on_FilesDialogAccepted();
+    void updateAlphaWins();
+    void updateBetaWins();
     void closeEvent(QCloseEvent *event);
 
 private:
@@ -124,6 +130,7 @@ private:
     void serialize(const char *, void *, int);
     void deserialize(const char *, void *, int);
     void scoreAutoUpdate(QSpinBox *teamScore, QCheckBox *teamCheckBox);
+    void colorAutoUpdate();
     void roundAutoUpdate();
     void resetFields();
     QString getColorsLocal();
@@ -136,5 +143,7 @@ private:
     QString directories[dirAmount];
     bool mirrored;
 };
+
+
 
 #endif // MAINWINDOW_H
