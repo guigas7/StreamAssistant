@@ -11,6 +11,8 @@ public:
     void saveInFile(QString importingDir, QWidget *wid, QString section = "", QString fileToSave = "", QString content = "");
     void init(QString importingDir, QWidget *wid, QString extension = "");
     void saveWithImage(QString importingDir, QWidget *wid, QString local);
+    void initTeamContentFromFolder();
+    void saveTeamContentFromFolder();
 };
 
 #endif // LINEEDITWIDGET_H

@@ -103,6 +103,7 @@ private slots:
     void on_BetaWinGame7_clicked();
     void on_BetaWinGame8_clicked();
     void on_BetaWinGame9_clicked();
+    void saveRound(int index);
     void on_actionSet_Directories_triggered();
     void on_actionUpdate_Options_triggered();
     void on_UpdateScoreCheckbox_stateChanged(int arg1);
@@ -114,6 +115,11 @@ private slots:
     void updateAlphaWins();
     void updateBetaWins();
     void closeEvent(QCloseEvent *event);
+    void on_actionSet_toggled(bool arg1);
+    void on_actionRound_toggled(bool arg1);
+    void on_actionTeams_toggled(bool arg1);
+
+    void on_actionInfoAndCasters_toggled(bool arg1);
 
 private:
     Ui::MainWindow *ui;
@@ -125,7 +131,7 @@ private:
     void setSection_init();
     void colors_init();
     QMap<QString, MyWidget*> widgets_init();
-    QStringList getListOf(QString dirIndex);
+    QStringList getListOf(QString dirIndex, bool includeDirs = false);
     void writeInFile(QString filename, QString text);
     void serialize(const char *, void *, int);
     void deserialize(const char *, void *, int);
@@ -133,7 +139,12 @@ private:
     void colorAutoUpdate();
     void roundAutoUpdate();
     void resetFields();
+    QStringList clearOptionalFiles(QStringList, QString);
+    QStringList saveOptionalFiles(QString, QString);
+    void copyFile(QString, QString);
+    void updateFileTimestamp(QString);
     QString getColorsLocal();
+    void showSections_init();
     QCompleter *Team1Completer;
     QCompleter *Team2Completer;
     QCompleter *regionCompleter;
@@ -142,6 +153,8 @@ private:
     QMap<QString, MyWidget *> widgetFor;
     QString directories[dirAmount];
     bool mirrored;
+    QStringList teamAlphaOptionalFiles;
+    QStringList teamBravoOptionalFiles;
 };
 
 

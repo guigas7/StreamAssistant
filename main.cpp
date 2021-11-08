@@ -18,7 +18,8 @@ int main(int argc, char *argv[])
         }
     }
     MainWindow w;
-    w.resize(1300, 400);
+    w.resize(1290, 400);
+    //w.resize(450, 1000);
     w.show();
     w.setWindowTitle(QApplication::translate("toplevel", "Stream Assistant"));
     return a.exec();

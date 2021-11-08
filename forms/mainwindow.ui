@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1337</width>
-    <height>402</height>
+    <width>1324</width>
+    <height>409</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -36,8 +36,8 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>0</width>
-          <height>0</height>
+          <width>281</width>
+          <height>171</height>
          </size>
         </property>
         <property name="maximumSize">
@@ -60,8 +60,8 @@
          </property>
          <property name="minimumSize">
           <size>
-           <width>0</width>
-           <height>0</height>
+           <width>91</width>
+           <height>91</height>
           </size>
          </property>
          <property name="maximumSize">
@@ -200,8 +200,8 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>0</width>
-          <height>0</height>
+          <width>281</width>
+          <height>171</height>
          </size>
         </property>
         <property name="maximumSize">
@@ -367,8 +367,8 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>0</width>
-        <height>0</height>
+        <width>211</width>
+        <height>344</height>
        </size>
       </property>
       <property name="maximumSize">
@@ -454,58 +454,22 @@
           </item>
          </layout>
         </item>
-        <item alignment="Qt::AlignHCenter">
+        <item>
          <widget class="QPushButton" name="ResetScoresButton">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>85</width>
-            <height>23</height>
-           </size>
-          </property>
           <property name="text">
            <string>Reset Scores</string>
           </property>
          </widget>
         </item>
-        <item alignment="Qt::AlignHCenter">
+        <item>
          <widget class="QPushButton" name="SwapTeamsButton">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>85</width>
-            <height>23</height>
-           </size>
-          </property>
           <property name="text">
            <string>Swap Teams</string>
           </property>
          </widget>
         </item>
-        <item alignment="Qt::AlignHCenter">
+        <item>
          <widget class="QPushButton" name="SwapColorsButton">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>85</width>
-            <height>23</height>
-           </size>
-          </property>
           <property name="text">
            <string>Reverse Colors</string>
           </property>
@@ -521,27 +485,8 @@
           </property>
          </widget>
         </item>
-        <item alignment="Qt::AlignHCenter">
-         <widget class="QComboBox" name="ColorGroupCombo">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>200</width>
-            <height>16777215</height>
-           </size>
-          </property>
-         </widget>
+        <item>
+         <widget class="QComboBox" name="ColorGroupCombo"/>
         </item>
         <item>
          <widget class="QLabel" name="ColorsLabel">
@@ -553,27 +498,8 @@
           </property>
          </widget>
         </item>
-        <item alignment="Qt::AlignHCenter">
-         <widget class="QComboBox" name="ColorsCombo">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>200</width>
-            <height>16777215</height>
-           </size>
-          </property>
-         </widget>
+        <item>
+         <widget class="QComboBox" name="ColorsCombo"/>
         </item>
        </layout>
       </widget>
@@ -594,8 +520,8 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>0</width>
-          <height>0</height>
+          <width>291</width>
+          <height>171</height>
          </size>
         </property>
         <property name="maximumSize">
@@ -779,8 +705,8 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>0</width>
-          <height>0</height>
+          <width>291</width>
+          <height>171</height>
          </size>
         </property>
         <property name="maximumSize">
@@ -939,7 +865,7 @@
       <property name="minimumSize">
        <size>
         <width>500</width>
-        <height>0</height>
+        <height>350</height>
        </size>
       </property>
       <property name="maximumSize">
@@ -1871,7 +1797,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1337</width>
+     <width>1324</width>
      <height>21</height>
     </rect>
    </property>
@@ -1893,6 +1819,11 @@
     <addaction name="menuShow"/>
    </widget>
    <addaction name="menuTest"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
   </widget>
   <action name="actionSet_Directories">
    <property name="text">

@@ -60,8 +60,6 @@ QString MyWidget::findImageWithExtension(QString filename)
         return filename + ".png";
     } else if (QFile::exists(filename + ".jpg")) {
         return filename + ".jpg";
-    } else if (QFile::exists(filename)) {
-        return filename;
     }
     return "";
 }

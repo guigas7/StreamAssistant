@@ -41,3 +41,7 @@ void LineEditWidget::saveWithImage(QString importingDir, QWidget *wid, QString l
     this->writeInFile(copyTo + ".txt", widget->text());
 }
 
+void LineEditWidget::saveTeamContentFromFolder()
+{
+
+}

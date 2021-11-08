@@ -6,16 +6,27 @@ void LabelWidget::init(QString importingDir, QWidget *wid, QString section, QStr
 {
     QLabel *logo = (QLabel *)wid;
     QString image = this->findImageWithExtension(section + imageName);
+    QString destinyDir = importingDir + this->getSection();
+    QString originDir = section;
     if (image.isEmpty()) {
-        if (!otherTeamSection.isEmpty()) {
-            image = this->findImageWithExtension(otherTeamSection + imageName);
-        }
-        if (image.isEmpty()) {
-            image = this->getRandomImageName(defaultDir);
+        QDir teamDir(section + imageName);
+        if (teamDir.exists()) { // found directory
+            originDir = section + imageName + "/";
+            image = this->findImageWithExtension(originDir + "logo");
+            if (image.isEmpty()) {
+                image = this->getRandomImageName(defaultDir);
+            }
+        } else {
+            if (!otherTeamSection.isEmpty()) {
+                image = this->findImageWithExtension(otherTeamSection + imageName);
+            }
+            if (image.isEmpty()) {
+                image = this->getRandomImageName(defaultDir);
+            }
         }
     }
     // Copy image to importing file
-    this->copyFile(image, importingDir + this->getSection() + this->getFileToSave());
+    this->copyFile(image, destinyDir + this->getFileToSave());
     // Show team logo on screen
     this->keepAspectInLabel(image, logo);
 }
