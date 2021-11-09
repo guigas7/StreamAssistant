@@ -38,8 +38,8 @@ void CheckBoxWidget::handleCheck(QString importingDir, QWidget *wid, QString tea
         if (directory.exists()) {
             QStringList winPointsList = directory.entryList(QDir::Files);
             for (int i = 0; i < winPointsList.size(); ++i) {
-                // Get original source winpoint file
-                winPointFile = this->findImageWithExtension(teamPointsDir + "/" + winPointsList.at(i));
+                winPointFile = teamPointsDir + winPointsList.at(i);
+                qDebug() << "Winpoint file: " + winPointFile;
                 // Save on sets folder with Game number _ file without extension
                 savingPointFile = savingDir + this->getFileToSave() + "_" + winPointsList.at(i).split(".").at(0);
                 this->copyFile(winPointFile, savingPointFile);
