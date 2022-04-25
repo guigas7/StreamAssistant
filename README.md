@@ -121,17 +121,17 @@ Similar to Maps and Modes, each game can have up to 8 players and 8 weapons (1 -
 
 By double clicking the label of the first game in the players tab, if all the fields from that game are empty it will fill the fields with the first players from files member1.txt to member4.txt, if they exist.
 
-![Players1](Splatoon%20Stream%20Assistant%2095e4e81d4e404c7994af32a5d5d1977d/Players1.png)
+![Players1](Guide_images/Players1.png)
 
-![Players2](Splatoon%20Stream%20Assistant%2095e4e81d4e404c7994af32a5d5d1977d/Players2.png)
+![Players2](Guide_images/Players2.png)
 
 To clear the players / weapons selected for a team. There’s a button in the bottom of the section to clear all games, or you can double click a game label to clear the data only for that game and team.
 
 If there’s no weapon / player selected for that game, double clicking the game label will copy the selection for the previous game.
 
-![Players3](Splatoon%20Stream%20Assistant%2095e4e81d4e404c7994af32a5d5d1977d/Players3.png)
+![Players3](Guide_images/Players3.png)
 
-![Players4](Splatoon%20Stream%20Assistant%2095e4e81d4e404c7994af32a5d5d1977d/Players4.png)
+![Players4](Guide_images/Players4.png)
 
 # Colors
 
@@ -139,11 +139,11 @@ On the Colors directory you can add colors for each colorset (Ranked, Turf war, 
 
 The colors have a set order that the game follows once a lobby is opened. If you order the image files for the colors correctly (like the example below) and set the auto update colors, you’ll only need to select the color for the first game of the set, and the next color will be selected once the round is changed.
 
-![Colors1](Splatoon%20Stream%20Assistant%2095e4e81d4e404c7994af32a5d5d1977d/Colors1.png)
+![Colors1](Guide_images/Colors1.png)
 
-![Colors2](Splatoon%20Stream%20Assistant%2095e4e81d4e404c7994af32a5d5d1977d/Colors2.png)
+![Colors2](Guide_images/Colors2.png)
 
-![Colors3](Splatoon%20Stream%20Assistant%2095e4e81d4e404c7994af32a5d5d1977d/Colors3.png)
+![Colors3](Guide_images/Colors3.png)
 
 - For each color group you can have 3 different set of images:
     - alpha: For images containing the color for the Alpha team
