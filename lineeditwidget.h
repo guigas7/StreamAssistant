@@ -10,9 +10,7 @@ public:
     explicit LineEditWidget(QString sec, QString fts);
     void saveInFile(QString importingDir, QWidget *wid, QString section = "", QString fileToSave = "", QString content = "");
     void init(QString importingDir, QWidget *wid, QString extension = "");
-    void saveWithImage(QString importingDir, QWidget *wid, QString local);
-    void initTeamContentFromFolder();
-    void saveTeamContentFromFolder();
+    void saveWithImage(QString importingDir, QWidget *wid, QString local, QString defaultDir = "");
 };
 
 #endif // LINEEDITWIDGET_H

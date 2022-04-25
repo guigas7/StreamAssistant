@@ -31,6 +31,8 @@ void RadioButtonWidget::setRound(QString importingDir, QString id)
     QString mapFile = importingDir + "/set/maps/" + id;
     QString modeFile = importingDir + "/set/modes/" + id;
     QString winnerFile = importingDir + "/set/winners/" + id;
+    QString playerFile;
+    QString weaponFile;
     QString setDir = importingDir + "/set/";
     this->copyFile(mapFile, setDir + "currentMap");
     this->copyFile(mapFile + ".txt", setDir + "currentMap.txt");
@@ -38,4 +40,13 @@ void RadioButtonWidget::setRound(QString importingDir, QString id)
     this->copyFile(modeFile + ".txt", setDir + "currentMode.txt");
     this->copyFile(winnerFile, setDir + "currentWinner");
     this->copyFile(winnerFile + ".txt", setDir + "currentWinner.txt");
+    for (int i = 1; i < 9; ++i) {
+        playerFile = importingDir + "/set/players/" + "R" + id + "_" + QString::number(i);
+        this->copyFile(playerFile + ".txt", setDir + "Player" + QString::number(i) + ".txt");
+    }
+    for (int i = 1; i < 9; ++i) {
+        weaponFile = importingDir + "/set/weapons/" + "R" + id + "_" + QString::number(i);
+        this->copyFile(weaponFile + ".txt", setDir + "Weapon" + QString::number(i) + ".txt");
+        this->copyFile(weaponFile, setDir + "Weapon" + QString::number(i));
+    }
 }

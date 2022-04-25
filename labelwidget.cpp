@@ -14,14 +14,14 @@ void LabelWidget::init(QString importingDir, QWidget *wid, QString section, QStr
             originDir = section + imageName + "/";
             image = this->findImageWithExtension(originDir + "logo");
             if (image.isEmpty()) {
-                image = this->getRandomImageName(defaultDir);
+                image = this->getRandomImageName(defaultDir + "/" + getFileToSave());
             }
         } else {
             if (!otherTeamSection.isEmpty()) {
                 image = this->findImageWithExtension(otherTeamSection + imageName);
             }
             if (image.isEmpty()) {
-                image = this->getRandomImageName(defaultDir);
+                image = this->getRandomImageName(defaultDir + "/" + getFileToSave());
             }
         }
     }

@@ -26,22 +26,18 @@ void LineEditWidget::saveInFile(QString importingDir, QWidget *wid, QString sect
     this->writeInFile(importingDir + sec + fts, cont);
 }
 
-void LineEditWidget::saveWithImage(QString importingDir, QWidget *wid, QString local)
+void LineEditWidget::saveWithImage(QString importingDir, QWidget *wid, QString local, QString defaultDir)
 {
     QLineEdit *widget = (QLineEdit *) wid;
     QString copyTo = importingDir + this->getSection() + this->getFileToSave();
-    QString nameToSave = local + "/" + widget->text();
-    nameToSave = this->findImageWithExtension(nameToSave);
-    if (!nameToSave.isEmpty()) {
-        this->copyFile(nameToSave, copyTo);
-        QFileInfo path(nameToSave);
-        nameToSave = path.baseName();
-        this->writeInFile(copyTo + ".txt", nameToSave);
+    QString copyFrom = local + "/" + widget->text();
+    copyFrom = this->findImageWithExtension(copyFrom);
+    if (!copyFrom.isEmpty()) {
+        this->copyFile(copyFrom, copyTo);
+    } else if (!defaultDir.isEmpty()) {
+        copyFrom = this->getRandomImageName(defaultDir);
+        this->copyFile(copyFrom, copyTo);
     }
     this->writeInFile(copyTo + ".txt", widget->text());
 }
 
-void LineEditWidget::saveTeamContentFromFolder()
-{
-
-}

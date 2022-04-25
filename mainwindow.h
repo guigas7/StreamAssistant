@@ -13,8 +13,9 @@
 #include "radiobuttonwidget.h"
 #include "labelwidget.h"
 #include "plaintextwidget.h"
+#include "clickablelabel.h"
 
-#define widAmount 69
+#define widAmount 67
 
 
 
@@ -38,7 +39,7 @@ private slots:
     void on_Team1Score_textChanged(const QString &arg1);
     void on_Team2Score_textChanged(const QString &arg1);
     void on_ResetScoresButton_clicked();
-    // Team Beta Section
+    // Team Bravo Section
     // Info Section
     void on_TitleEdit_editingFinished();
     void on_SubtitleEdit_editingFinished();
@@ -54,8 +55,6 @@ private slots:
     void on_RoundEdit_editingFinished();
     void on_Team2NameEdit_editingFinished();
     void on_LogoCombo_activated(int index);
-    void on_Team1RegionCombo_activated(int index);
-    void on_Team2RegionCombo_activated(int index);
     void on_ColorGroupCombo_activated(int index);
     void on_ModeComboGame1_activated(int index);
     void on_ModeComboGame2_activated(int index);
@@ -94,15 +93,15 @@ private slots:
     void on_AlphaWinGame7_clicked();
     void on_AlphaWinGame8_clicked();
     void on_AlphaWinGame9_clicked();
-    void on_BetaWinGame1_clicked();
-    void on_BetaWinGame2_clicked();
-    void on_BetaWinGame3_clicked();
-    void on_BetaWinGame4_clicked();
-    void on_BetaWinGame5_clicked();
-    void on_BetaWinGame6_clicked();
-    void on_BetaWinGame7_clicked();
-    void on_BetaWinGame8_clicked();
-    void on_BetaWinGame9_clicked();
+    void on_BravoWinGame1_clicked();
+    void on_BravoWinGame2_clicked();
+    void on_BravoWinGame3_clicked();
+    void on_BravoWinGame4_clicked();
+    void on_BravoWinGame5_clicked();
+    void on_BravoWinGame6_clicked();
+    void on_BravoWinGame7_clicked();
+    void on_BravoWinGame8_clicked();
+    void on_BravoWinGame9_clicked();
     void saveRound(int index);
     void on_actionSet_Directories_triggered();
     void on_actionUpdate_Options_triggered();
@@ -113,13 +112,12 @@ private slots:
     void on_SwapTeamsButton_clicked();
     void on_FilesDialogAccepted();
     void updateAlphaWins();
-    void updateBetaWins();
-    void closeEvent(QCloseEvent *event);
-    void on_actionSet_toggled(bool arg1);
-    void on_actionRound_toggled(bool arg1);
-    void on_actionTeams_toggled(bool arg1);
-
-    void on_actionInfoAndCasters_toggled(bool arg1);
+    void updateBravoWins();
+    void updateWeapon();
+    void updatePlayer();
+    void labelClicked();
+    void roundLabelHovered();
+    void resetFields();
 
 private:
     Ui::MainWindow *ui;
@@ -130,33 +128,39 @@ private:
     void castersSection_init();
     void setSection_init();
     void colors_init();
+    void weaponsSection_init();
+    QMap<QString, MyWidget*> playersSection_init();
     QMap<QString, MyWidget*> widgets_init();
+    QMap<QString, QLabel*> weapons_init();
     QStringList getListOf(QString dirIndex, bool includeDirs = false);
-    void writeInFile(QString filename, QString text);
+    void writeInFile(QString, QString);
     void serialize(const char *, void *, int);
     void deserialize(const char *, void *, int);
     void scoreAutoUpdate(QSpinBox *teamScore, QCheckBox *teamCheckBox);
     void colorAutoUpdate();
     void roundAutoUpdate();
-    void resetFields();
+    void clearFields();
     QStringList clearOptionalFiles(QStringList, QString);
     QStringList saveOptionalFiles(QString, QString);
     void copyFile(QString, QString);
     void updateFileTimestamp(QString);
     QString getColorsLocal();
     void showSections_init();
+    void updatePlayersFromAlpha();
+    void updatePlayersFromBravo();
+    void fillFirstPlayers(QString team);
     QCompleter *Team1Completer;
     QCompleter *Team2Completer;
-    QCompleter *regionCompleter;
     QCompleter *MapCompleter;
+    QCompleter *WeaponsCompleter;
     QMap<QString, QString> directoryFor;
     QMap<QString, MyWidget *> widgetFor;
+    QMap<QString, QLabel *> labelFor;
+    QMap<QString, MyWidget *> playerWidgetFor;
     QString directories[dirAmount];
     bool mirrored;
     QStringList teamAlphaOptionalFiles;
     QStringList teamBravoOptionalFiles;
 };
-
-
 
 #endif // MAINWINDOW_H

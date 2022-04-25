@@ -60,6 +60,12 @@ QString MyWidget::findImageWithExtension(QString filename)
         return filename + ".png";
     } else if (QFile::exists(filename + ".jpg")) {
         return filename + ".jpg";
+    } else if (QFile::exists(filename + ".jpeg")) {
+        return filename + ".jpeg";
+    } else if (QFile::exists(filename + ".gif")) {
+        return filename + ".gif";
+    } else if (QFile::exists(filename + ".jfif")) {
+        return filename + ".jfif";
     }
     return "";
 }
@@ -79,14 +85,14 @@ MyWidget::~MyWidget()
 
 QString MyWidget::getRandomImageName(QString defaultDir)
 {
-    QDir directory(defaultDir + "/" + this->getFileToSave());
+    QDir directory(defaultDir);
     QStringList imagesList = directory.entryList(QDir::Files);
     int max = imagesList.size();
     QRandomGenerator::global()->generate();
     if (max > 0) {
         int picked = QRandomGenerator::global()->bounded(max);
         if (picked > -1) {
-            return defaultDir + "/" + getFileToSave() + "/" + imagesList.at(picked);
+            return defaultDir + "/" + imagesList.at(picked);
         }
     }
     return "Nenhuma imagem padrão para escolher";
@@ -102,6 +108,7 @@ void MyWidget::showImageInLabel(QString imageName, QLabel *logo, Qt::AspectRatio
             image.mirror(1, 1);
         }
         logo->setPixmap(QPixmap::fromImage(image));
+        logo->setScaledContents( true );
     } else {
         qDebug() << "couldn't load image " + imageName;
     }

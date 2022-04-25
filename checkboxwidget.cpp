@@ -39,7 +39,6 @@ void CheckBoxWidget::handleCheck(QString importingDir, QWidget *wid, QString tea
             QStringList winPointsList = directory.entryList(QDir::Files);
             for (int i = 0; i < winPointsList.size(); ++i) {
                 winPointFile = teamPointsDir + winPointsList.at(i);
-                qDebug() << "Winpoint file: " + winPointFile;
                 // Save on sets folder with Game number _ file without extension
                 savingPointFile = savingDir + this->getFileToSave() + "_" + winPointsList.at(i).split(".").at(0);
                 this->copyFile(winPointFile, savingPointFile);
@@ -48,9 +47,9 @@ void CheckBoxWidget::handleCheck(QString importingDir, QWidget *wid, QString tea
     } else {
         QFile logo(imageFile);
         QFile name(nameFile);
-        logo.remove();
-        name.remove();
-        // Delete winpoints
+        logo.resize(0);
+        name.resize(0);
+        // removing winpoints
         QDir directory(savingDir);
         if (directory.exists()) {
             QStringList search;
@@ -59,7 +58,7 @@ void CheckBoxWidget::handleCheck(QString importingDir, QWidget *wid, QString tea
             QFile toDelete;
             for (int i = 0; i < filesList.size(); ++i) {
                 toDelete.setFileName(savingDir + "/" + filesList.at(i));
-                toDelete.remove();
+                toDelete.open(QFile::WriteOnly|QFile::Truncate);
             }
         }
     }

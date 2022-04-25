@@ -16,12 +16,15 @@ MainWindow::MainWindow(QWidget *parent)
     // init functions
     this->widgetFor = this->widgets_init();
     this->configDirectories_init();
+    this->playerWidgetFor = this->playersSection_init();
+    this->labelFor = this->weapons_init();
     this->infoSection_init();
     this->teamsSection_init();
     this->roundSection_init();
     this->castersSection_init();
     this->setSection_init();
-    this->showSections_init();
+    this->weaponsSection_init();
+    //qDebug() << ui->tabBox->sizeHint();
 }
 
 MainWindow::~MainWindow()
@@ -38,33 +41,35 @@ void MainWindow::on_actionSet_Directories_triggered()
 
 void MainWindow::on_actionUpdate_Options_triggered()
 {
-    this->resetFields();
+    this->clearFields();
     this->infoSection_init();
     this->teamsSection_init();
     this->roundSection_init();
     this->castersSection_init();
     this->setSection_init();
+    this->weaponsSection_init();
+    this->playerWidgetFor = this->playersSection_init();
 }
 
 void MainWindow::on_FilesDialogAccepted()
 {
     this->configDirectories_init();
-    this->resetFields();
+    this->clearFields();
     this->infoSection_init();
     this->teamsSection_init();
     this->roundSection_init();
     this->castersSection_init();
     this->setSection_init();
+    this->weaponsSection_init();
+    this->playerWidgetFor = this->playersSection_init();
 }
 
-void MainWindow::resetFields()
+void MainWindow::clearFields()
 {
     // Clear Combo options
     ui->ColorGroupCombo->clear();
     ui->ColorsCombo->clear();
     ui->LogoCombo->clear();
-    ui->Team1RegionCombo->clear();
-    ui->Team2RegionCombo->clear();
     ui->ModeComboGame1->clear();
     ui->ModeComboGame2->clear();
     ui->ModeComboGame3->clear();
@@ -104,6 +109,7 @@ void MainWindow::updateFileTimestamp(QString filePath)
     file.seek(size);
     file.write( QByteArray(1, '0') );
     file.resize(size);
+    file.close();
     return;
 }
 
@@ -117,8 +123,11 @@ void MainWindow::copyFile(QString source, QString destiny)
 
 QStringList MainWindow::clearOptionalFiles(QStringList files, QString directory)
 {
+    QFile file;
     for (int i = 0; i < files.size(); ++i) {
-        QFile::remove(directory + files.at(i));
+        file.setFileName(directory + files.at(i));
+        file.open(QFile::WriteOnly|QFile::Truncate);
+        file.close();
     }
     files.clear();
     return files;
@@ -145,7 +154,7 @@ QStringList MainWindow::saveOptionalFiles(QString originDir, QString destinyDir)
         }
         // All image files
         filters.clear();
-        filters << "*.jpg" << "*.png";
+        filters << "*.jpg" << "*.jpeg" << "*.png" << "*.gif" << "*.jfif";
         teamDir.setNameFilters(filters);
         fileList = teamDir.entryList(filters);
         int lastPoint;
@@ -155,7 +164,7 @@ QStringList MainWindow::saveOptionalFiles(QString originDir, QString destinyDir)
             if (lastPoint == -1) { // if there's no extension, keep it the same
                 destinyFile = destinyDir + fileList.at(i);
                 optionalFiles << fileList.at(i);
-            } else { // if there's and extension, remove it
+            } else { // if there's an extension, remove it
                 destinyFile = destinyDir + fileList.at(i).left(lastPoint);
                 optionalFiles << fileList.at(i).left(lastPoint);
             this->copyFile(originFile, destinyFile);
@@ -171,9 +180,10 @@ void MainWindow::configDirectories_init()
 {
     // Initialize config filenames
     QString dirs[dirAmount] = {
-        "/AlphaTeamDirectory.txt", "/BetaTeamDirectory.txt", "/RegionsDirectory.txt", "/LogosDirectory.txt",
+        "/AlphaTeamDirectory.txt", "/BravoTeamDirectory.txt", "/LogosDirectory.txt",
         "/MapsDirectory.txt", "/ModeIconsDirectory.txt", "/SplatfestColorsDirectory.txt", "/TurfWarColorsDirectory.txt",
-        "/RankedColorsDirectory.txt", "/ImportingFilesDirectory.txt", "/DefaultDirectory.txt", "/WinPointsDirectory.txt"
+        "/RankedColorsDirectory.txt", "/ImportingFilesDirectory.txt", "/DefaultDirectory.txt", "/WinPointsDirectory.txt",
+        "/WeaponsDirectory.txt"
     };
     for (int i = 0; i < dirAmount; i++) {
         this->directories[i] = dirs[i];
@@ -259,12 +269,11 @@ void MainWindow::teamsSection_init()
 {
     QString importDir = this->directoryFor["/ImportingFilesDirectory.txt"];
     QString defaultDir = this->directoryFor["/DefaultDirectory.txt"];
-    QString betaDir = this->directoryFor["/BetaTeamDirectory.txt"];
+    QString bravoDir = this->directoryFor["/BravoTeamDirectory.txt"];
     QString alphaDir = this->directoryFor["/AlphaTeamDirectory.txt"];
     LineEditWidget *alphaName {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Team1NameEdit->objectName()])};
     LabelWidget *alphaLogo {dynamic_cast<LabelWidget *>(this->widgetFor[ui->Team1Logo->objectName()])};
     SpinBoxWidget *alphaScore {dynamic_cast<SpinBoxWidget *>(this->widgetFor[ui->Team1Score->objectName()])};
-    ComboBoxWidget *alphaRegion {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->Team1RegionCombo->objectName()])};
     // Set Team Alpha Autocomplete
     QStringList team1CompletionList = this->getListOf(alphaDir, true);
 
@@ -275,26 +284,23 @@ void MainWindow::teamsSection_init()
     alphaName->init(importDir, ui->Team1NameEdit);
     alphaLogo->init(importDir, ui->Team1Logo, alphaDir, "/" + ui->Team1NameEdit->text(), defaultDir);
     alphaScore->init(importDir, ui->Team1Score);
-    alphaRegion->init(importDir, ui->Team1RegionCombo, this->directoryFor["/RegionsDirectory.txt"]);
     this->on_Team1NameEdit_editingFinished();
 
-    // Team Beta
+    // Team Bravo
 
-    LineEditWidget *betaName {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Team2NameEdit->objectName()])};
-    LabelWidget *betaLogo {dynamic_cast<LabelWidget *>(this->widgetFor[ui->Team2Logo->objectName()])};
-    SpinBoxWidget *betaScore {dynamic_cast<SpinBoxWidget *>(this->widgetFor[ui->Team2Score->objectName()])};
-    ComboBoxWidget *betaRegion {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->Team2RegionCombo->objectName()])};
-    // Set Team Beta Autocomplete
-    QStringList team2CompletionList = this->getListOf(betaDir, true);
+    LineEditWidget *bravoName {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Team2NameEdit->objectName()])};
+    LabelWidget *bravoLogo {dynamic_cast<LabelWidget *>(this->widgetFor[ui->Team2Logo->objectName()])};
+    SpinBoxWidget *bravoScore {dynamic_cast<SpinBoxWidget *>(this->widgetFor[ui->Team2Score->objectName()])};
+    // Set Team Bravo Autocomplete
+    QStringList team2CompletionList = this->getListOf(bravoDir, true);
 
     this->Team2Completer = new QCompleter(team2CompletionList, this);
     this->Team2Completer->setCaseSensitivity(Qt::CaseInsensitive);
     this->Team2Completer->setFilterMode(Qt::MatchContains);
     ui->Team2NameEdit->setCompleter(this->Team2Completer);
-    betaName->init(importDir, ui->Team2NameEdit);
-    betaLogo->init(importDir, ui->Team2Logo, betaDir, "/" + ui->Team2NameEdit->text(), defaultDir);
-    betaScore->init(importDir, ui->Team2Score);
-    betaRegion->init(importDir, ui->Team2RegionCombo, this->directoryFor["/RegionsDirectory.txt"]);
+    bravoName->init(importDir, ui->Team2NameEdit);
+    bravoLogo->init(importDir, ui->Team2Logo, bravoDir, "/" + ui->Team2NameEdit->text(), defaultDir);
+    bravoScore->init(importDir, ui->Team2Score);
     this->on_Team2NameEdit_editingFinished();
 }
 
@@ -458,25 +464,95 @@ void MainWindow::setSection_init()
     alphaWin8->init(importDir, ui->AlphaWinGame8, ui->Team1NameEdit->text());
     CheckBoxWidget *alphaWin9 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame9->objectName()])};
     alphaWin9->init(importDir, ui->AlphaWinGame9, ui->Team1NameEdit->text());
-    // Beta Game Winner Checkboxes
-    CheckBoxWidget *betaWin1 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame1->objectName()])};
-    betaWin1->init(importDir, ui->BetaWinGame1, ui->Team2NameEdit->text());
-    CheckBoxWidget *betaWin2 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame2->objectName()])};
-    betaWin2->init(importDir, ui->BetaWinGame2, ui->Team2NameEdit->text());
-    CheckBoxWidget *betaWin3 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame3->objectName()])};
-    betaWin3->init(importDir, ui->BetaWinGame3, ui->Team2NameEdit->text());
-    CheckBoxWidget *betaWin4 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame4->objectName()])};
-    betaWin4->init(importDir, ui->BetaWinGame4, ui->Team2NameEdit->text());
-    CheckBoxWidget *betaWin5 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame5->objectName()])};
-    betaWin5->init(importDir, ui->BetaWinGame5, ui->Team2NameEdit->text());
-    CheckBoxWidget *betaWin6 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame6->objectName()])};
-    betaWin6->init(importDir, ui->BetaWinGame6, ui->Team2NameEdit->text());
-    CheckBoxWidget *betaWin7 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame7->objectName()])};
-    betaWin7->init(importDir, ui->BetaWinGame7, ui->Team2NameEdit->text());
-    CheckBoxWidget *betaWin8 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame8->objectName()])};
-    betaWin8->init(importDir, ui->BetaWinGame8, ui->Team2NameEdit->text());
-    CheckBoxWidget *betaWin9 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame9->objectName()])};
-    betaWin9->init(importDir, ui->BetaWinGame9, ui->Team2NameEdit->text());
+    // Bravo Game Winner Checkboxes
+    CheckBoxWidget *bravoWin1 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BravoWinGame1->objectName()])};
+    bravoWin1->init(importDir, ui->BravoWinGame1, ui->Team2NameEdit->text());
+    CheckBoxWidget *bravoWin2 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BravoWinGame2->objectName()])};
+    bravoWin2->init(importDir, ui->BravoWinGame2, ui->Team2NameEdit->text());
+    CheckBoxWidget *bravoWin3 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BravoWinGame3->objectName()])};
+    bravoWin3->init(importDir, ui->BravoWinGame3, ui->Team2NameEdit->text());
+    CheckBoxWidget *bravoWin4 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BravoWinGame4->objectName()])};
+    bravoWin4->init(importDir, ui->BravoWinGame4, ui->Team2NameEdit->text());
+    CheckBoxWidget *bravoWin5 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BravoWinGame5->objectName()])};
+    bravoWin5->init(importDir, ui->BravoWinGame5, ui->Team2NameEdit->text());
+    CheckBoxWidget *bravoWin6 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BravoWinGame6->objectName()])};
+    bravoWin6->init(importDir, ui->BravoWinGame6, ui->Team2NameEdit->text());
+    CheckBoxWidget *bravoWin7 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BravoWinGame7->objectName()])};
+    bravoWin7->init(importDir, ui->BravoWinGame7, ui->Team2NameEdit->text());
+    CheckBoxWidget *bravoWin8 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BravoWinGame8->objectName()])};
+    bravoWin8->init(importDir, ui->BravoWinGame8, ui->Team2NameEdit->text());
+    CheckBoxWidget *bravoWin9 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BravoWinGame9->objectName()])};
+    bravoWin9->init(importDir, ui->BravoWinGame9, ui->Team2NameEdit->text());
+}
+
+void MainWindow::weaponsSection_init()
+{
+    QString importDir = this->directoryFor["/ImportingFilesDirectory.txt"];
+    QString weaponsDir = this->directoryFor["/WeaponsDirectory.txt"];
+    // Set Team Alpha Autocomplete
+    QStringList weaponsCompletionList = this->getListOf(weaponsDir, true);
+    this->WeaponsCompleter = new QCompleter(weaponsCompletionList, this);
+    this->WeaponsCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    this->WeaponsCompleter->setFilterMode(Qt::MatchContains);
+    // Init Field
+    QList<QString> keys = widgetFor.keys();
+    MyWidget *wid;
+    QLineEdit *qwid;
+    LineEditWidget *weapon;
+    for (int i = 67; i < 139; ++i) {
+        wid = widgetFor.value(keys.at(i));
+        qwid = ui->AlphaWeapons->findChild<QLineEdit *>(keys.at(i));
+        if (qwid == nullptr) qwid = ui->BravoWeapons->findChild<QLineEdit *>(keys.at(i));
+        qwid->setCompleter(this->WeaponsCompleter);
+        weapon = {dynamic_cast<LineEditWidget *>(wid)};
+        weapon->init(importDir, qwid, ".txt");
+        qwid->editingFinished();
+    }
+    QRegularExpression re("(Player|Weapon)(Alpha|Bravo)LabelR[1-9]");
+    QList<ClickableLabel *> labels = ui->TeamsTabs->findChildren<ClickableLabel *>(re, Qt::FindChildrenRecursively);
+    for (int i = 0; i < labels.count(); ++i) {
+        connect(labels.at(i), &ClickableLabel::dblClicked, this, &MainWindow::labelClicked);
+    }
+
+}
+
+QMap <QString, MyWidget*> MainWindow::playersSection_init()
+{
+    connect(ui->PlayersResetAlpha, &QPushButton::clicked, this, &MainWindow::resetFields);
+    connect(ui->PlayersResetBravo, &QPushButton::clicked, this, &MainWindow::resetFields);
+
+    QString importDir = this->directoryFor["/ImportingFilesDirectory.txt"];
+    QString alphaDir = this->directoryFor["/AlphaTeamDirectory.txt"];
+    QString bravoDir = this->directoryFor["/BravoTeamDirectory.txt"];
+    QComboBox *playerWidgets[72] = {
+        ui->PlayersR1_1, ui->PlayersR1_2, ui->PlayersR1_3, ui->PlayersR1_4,
+        ui->PlayersR2_1, ui->PlayersR2_2, ui->PlayersR2_3, ui->PlayersR2_4,
+        ui->PlayersR3_1, ui->PlayersR3_2, ui->PlayersR3_3, ui->PlayersR3_4,
+        ui->PlayersR4_1, ui->PlayersR4_2, ui->PlayersR4_3, ui->PlayersR4_4,
+        ui->PlayersR5_1, ui->PlayersR5_2, ui->PlayersR5_3, ui->PlayersR5_4,
+        ui->PlayersR6_1, ui->PlayersR6_2, ui->PlayersR6_3, ui->PlayersR6_4,
+        ui->PlayersR7_1, ui->PlayersR7_2, ui->PlayersR7_3, ui->PlayersR7_4,
+        ui->PlayersR8_1, ui->PlayersR8_2, ui->PlayersR8_3, ui->PlayersR8_4,
+        ui->PlayersR9_1, ui->PlayersR9_2, ui->PlayersR9_3, ui->PlayersR9_4,
+        ui->PlayersR1_5, ui->PlayersR1_6, ui->PlayersR1_7, ui->PlayersR1_8,
+        ui->PlayersR2_5, ui->PlayersR2_6, ui->PlayersR2_7, ui->PlayersR2_8,
+        ui->PlayersR3_5, ui->PlayersR3_6, ui->PlayersR3_7, ui->PlayersR3_8,
+        ui->PlayersR4_5, ui->PlayersR4_6, ui->PlayersR4_7, ui->PlayersR4_8,
+        ui->PlayersR5_5, ui->PlayersR5_6, ui->PlayersR5_7, ui->PlayersR5_8,
+        ui->PlayersR6_5, ui->PlayersR6_6, ui->PlayersR6_7, ui->PlayersR6_8,
+        ui->PlayersR7_5, ui->PlayersR7_6, ui->PlayersR7_7, ui->PlayersR7_8,
+        ui->PlayersR8_5, ui->PlayersR8_6, ui->PlayersR8_7, ui->PlayersR8_8,
+        ui->PlayersR9_5, ui->PlayersR9_6, ui->PlayersR9_7, ui->PlayersR9_8,
+    };
+    int max = sizeof(playerWidgets) / sizeof(QComboBox *);
+    QMap<QString, MyWidget*> players;
+    for (int i = 0; i < max; ++i) {
+        players[playerWidgets[i]->objectName()] = new ComboBoxWidget("/set/players/", playerWidgets[i]->objectName().right(4));
+        ComboBoxWidget *player {dynamic_cast<ComboBoxWidget *>(players[playerWidgets[i]->objectName()])};
+        player->initPlayers(importDir, playerWidgets[i]);
+        connect(playerWidgets[i], &QComboBox::activated, this, &MainWindow::updatePlayer);
+    }
+    return players;
 }
 
 void MainWindow::writeInFile(QString filename, QString text)
@@ -517,15 +593,8 @@ void MainWindow::on_Team1NameEdit_editingFinished()
     this->teamAlphaOptionalFiles = this->saveOptionalFiles(alphaDir + "/" + ui->Team1NameEdit->text() + "/", importDir + "/teamAlpha/");
 
     this->updateAlphaWins();
+    this->updatePlayersFromAlpha();
 }
-
-void MainWindow::on_Team1RegionCombo_activated(int index)
-{
-    QString local = this->directoryFor["/RegionsDirectory.txt"];
-    ComboBoxWidget *regionsCombo {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->Team1RegionCombo->objectName()])};
-    regionsCombo->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->Team1RegionCombo, "no image", local);
-}
-
 
 void MainWindow::updateAlphaWins()
 {
@@ -564,73 +633,67 @@ void MainWindow::updateAlphaWins()
 */
 
 /*
-/ Team Beta Section
+/ Team Bravo Section
 */
 
 void MainWindow::on_Team2NameEdit_editingFinished()
 {
     QString importDir = this->directoryFor["/ImportingFilesDirectory.txt"];
     QString defaultDir = this->directoryFor["/DefaultDirectory.txt"];
-    QString betaDir = this->directoryFor["/BetaTeamDirectory.txt"];
+    QString bravoDir = this->directoryFor["/BravoTeamDirectory.txt"];
     LineEditWidget *name {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Team2NameEdit->objectName()])};
     LabelWidget *logo {dynamic_cast<LabelWidget *>(this->widgetFor[ui->Team2Logo->objectName()])};
 
     // Clean early optional files
-    this->teamBravoOptionalFiles = this->clearOptionalFiles(this->teamBravoOptionalFiles, importDir + "/teamBeta/");
+    this->teamBravoOptionalFiles = this->clearOptionalFiles(this->teamBravoOptionalFiles, importDir + "/teamBravo/");
 
     name->saveInFile(importDir, ui->Team2NameEdit);
     // Save file with both team names
     QString teamNames = ui->Team1NameEdit->text() + " - " + ui->Team2NameEdit->text();
     name->saveInFile(importDir, ui->Team1NameEdit, "/round/", "teamNames.txt", teamNames);
-    logo->init(importDir, ui->Team2Logo, betaDir, "/" + ui->Team2NameEdit->text(), defaultDir);
+    logo->init(importDir, ui->Team2Logo, bravoDir, "/" + ui->Team2NameEdit->text(), defaultDir);
 
     // Add new optional files
-    this->teamBravoOptionalFiles = this->saveOptionalFiles(betaDir + "/" + ui->Team2NameEdit->text() + "/", importDir + "/teamBeta/");
+    this->teamBravoOptionalFiles = this->saveOptionalFiles(bravoDir + "/" + ui->Team2NameEdit->text() + "/", importDir + "/teamBravo/");
 
-    this->updateBetaWins();
+    this->updateBravoWins();
+    this->updatePlayersFromBravo();
 }
 
-void MainWindow::on_Team2RegionCombo_activated(int index)
-{
-    QString local = this->directoryFor["/RegionsDirectory.txt"];
-    ComboBoxWidget *regionsCombo {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->Team2RegionCombo->objectName()])};
-    regionsCombo->saveInFile(this->directoryFor["/ImportingFilesDirectory.txt"], ui->Team2RegionCombo, "no image", local);
-}
-
-void MainWindow::updateBetaWins()
+void MainWindow::updateBravoWins()
 {
     ui->Team2Score->setValue(0);
-    if (ui->BetaWinGame1->isChecked()) {
-        this->on_BetaWinGame1_clicked();
+    if (ui->BravoWinGame1->isChecked()) {
+        this->on_BravoWinGame1_clicked();
     }
-    if (ui->BetaWinGame2->isChecked()) {
-        this->on_BetaWinGame2_clicked();
+    if (ui->BravoWinGame2->isChecked()) {
+        this->on_BravoWinGame2_clicked();
     }
-    if (ui->BetaWinGame3->isChecked()) {
-        this->on_BetaWinGame3_clicked();
+    if (ui->BravoWinGame3->isChecked()) {
+        this->on_BravoWinGame3_clicked();
     }
-    if (ui->BetaWinGame4->isChecked()) {
-        this->on_BetaWinGame4_clicked();
+    if (ui->BravoWinGame4->isChecked()) {
+        this->on_BravoWinGame4_clicked();
     }
-    if (ui->BetaWinGame5->isChecked()) {
-        this->on_BetaWinGame5_clicked();
+    if (ui->BravoWinGame5->isChecked()) {
+        this->on_BravoWinGame5_clicked();
     }
-    if (ui->BetaWinGame6->isChecked()) {
-        this->on_BetaWinGame6_clicked();
+    if (ui->BravoWinGame6->isChecked()) {
+        this->on_BravoWinGame6_clicked();
     }
-    if (ui->BetaWinGame7->isChecked()) {
-        this->on_BetaWinGame7_clicked();
+    if (ui->BravoWinGame7->isChecked()) {
+        this->on_BravoWinGame7_clicked();
     }
-    if (ui->BetaWinGame8->isChecked()) {
-        this->on_BetaWinGame8_clicked();
+    if (ui->BravoWinGame8->isChecked()) {
+        this->on_BravoWinGame8_clicked();
     }
-    if (ui->BetaWinGame9->isChecked()) {
-        this->on_BetaWinGame9_clicked();
+    if (ui->BravoWinGame9->isChecked()) {
+        this->on_BravoWinGame9_clicked();
     }
 }
 
 /*
-/ END Team Beta Section
+/ END Team Bravo Section
 */
 
 /*
@@ -699,33 +762,33 @@ void MainWindow::on_ResetScoresButton_clicked()
     ui->AlphaWinGame9->setChecked(false);
     CheckBoxWidget *alphaWin9 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->AlphaWinGame9->objectName()])};
     alphaWin9->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->AlphaWinGame9, "/teamAlpha/", winPointsDir);
-    ui->BetaWinGame1->setChecked(false);
-    CheckBoxWidget *betaWin1 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame1->objectName()])};
-    betaWin1->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame1, "/teamBeta/", winPointsDir);
-    ui->BetaWinGame2->setChecked(false);
-    CheckBoxWidget *betaWin2 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame2->objectName()])};
-    betaWin2->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame2, "/teamBeta/", winPointsDir);
-    ui->BetaWinGame3->setChecked(false);
-    CheckBoxWidget *betaWin3 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame3->objectName()])};
-    betaWin3->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame3, "/teamBeta/", winPointsDir);
-    ui->BetaWinGame4->setChecked(false);
-    CheckBoxWidget *betaWin4 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame4->objectName()])};
-    betaWin4->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame4, "/teamBeta/", winPointsDir);
-    ui->BetaWinGame5->setChecked(false);
-    CheckBoxWidget *betaWin5 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame5->objectName()])};
-    betaWin5->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame5, "/teamBeta/", winPointsDir);
-    ui->BetaWinGame6->setChecked(false);
-    CheckBoxWidget *betaWin6 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame6->objectName()])};
-    betaWin6->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame6, "/teamBeta/", winPointsDir);
-    ui->BetaWinGame7->setChecked(false);
-    CheckBoxWidget *betaWin7 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame7->objectName()])};
-    betaWin7->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame7, "/teamBeta/", winPointsDir);
-    ui->BetaWinGame8->setChecked(false);
-    CheckBoxWidget *betaWin8 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame8->objectName()])};
-    betaWin8->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame8, "/teamBeta/", winPointsDir);
-    ui->BetaWinGame9->setChecked(false);
-    CheckBoxWidget *betaWin9 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BetaWinGame9->objectName()])};
-    betaWin9->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BetaWinGame9, "/teamBeta/", winPointsDir);
+    ui->BravoWinGame1->setChecked(false);
+    CheckBoxWidget *bravoWin1 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BravoWinGame1->objectName()])};
+    bravoWin1->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BravoWinGame1, "/teamBravo/", winPointsDir);
+    ui->BravoWinGame2->setChecked(false);
+    CheckBoxWidget *bravoWin2 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BravoWinGame2->objectName()])};
+    bravoWin2->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BravoWinGame2, "/teamBravo/", winPointsDir);
+    ui->BravoWinGame3->setChecked(false);
+    CheckBoxWidget *bravoWin3 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BravoWinGame3->objectName()])};
+    bravoWin3->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BravoWinGame3, "/teamBravo/", winPointsDir);
+    ui->BravoWinGame4->setChecked(false);
+    CheckBoxWidget *bravoWin4 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BravoWinGame4->objectName()])};
+    bravoWin4->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BravoWinGame4, "/teamBravo/", winPointsDir);
+    ui->BravoWinGame5->setChecked(false);
+    CheckBoxWidget *bravoWin5 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BravoWinGame5->objectName()])};
+    bravoWin5->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BravoWinGame5, "/teamBravo/", winPointsDir);
+    ui->BravoWinGame6->setChecked(false);
+    CheckBoxWidget *bravoWin6 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BravoWinGame6->objectName()])};
+    bravoWin6->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BravoWinGame6, "/teamBravo/", winPointsDir);
+    ui->BravoWinGame7->setChecked(false);
+    CheckBoxWidget *bravoWin7 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BravoWinGame7->objectName()])};
+    bravoWin7->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BravoWinGame7, "/teamBravo/", winPointsDir);
+    ui->BravoWinGame8->setChecked(false);
+    CheckBoxWidget *bravoWin8 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BravoWinGame8->objectName()])};
+    bravoWin8->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BravoWinGame8, "/teamBravo/", winPointsDir);
+    ui->BravoWinGame9->setChecked(false);
+    CheckBoxWidget *bravoWin9 {dynamic_cast<CheckBoxWidget *>(this->widgetFor[ui->BravoWinGame9->objectName()])};
+    bravoWin9->handleCheck(this->directoryFor["/ImportingFilesDirectory.txt"], ui->BravoWinGame9, "/teamBravo/", winPointsDir);
     ui->RadioGame1->setChecked(true);
     this->on_RadioGame1_clicked();
 }
@@ -747,15 +810,15 @@ void MainWindow::on_UpdateScoreCheckbox_stateChanged(int arg1)
         if (ui->AlphaWinGame9->isChecked()) count++;
         ui->Team1Score->setValue(count);
         count = 0;
-        if (ui->BetaWinGame1->isChecked()) count++;
-        if (ui->BetaWinGame2->isChecked()) count++;
-        if (ui->BetaWinGame3->isChecked()) count++;
-        if (ui->BetaWinGame4->isChecked()) count++;
-        if (ui->BetaWinGame5->isChecked()) count++;
-        if (ui->BetaWinGame6->isChecked()) count++;
-        if (ui->BetaWinGame7->isChecked()) count++;
-        if (ui->BetaWinGame8->isChecked()) count++;
-        if (ui->BetaWinGame9->isChecked()) count++;
+        if (ui->BravoWinGame1->isChecked()) count++;
+        if (ui->BravoWinGame2->isChecked()) count++;
+        if (ui->BravoWinGame3->isChecked()) count++;
+        if (ui->BravoWinGame4->isChecked()) count++;
+        if (ui->BravoWinGame5->isChecked()) count++;
+        if (ui->BravoWinGame6->isChecked()) count++;
+        if (ui->BravoWinGame7->isChecked()) count++;
+        if (ui->BravoWinGame8->isChecked()) count++;
+        if (ui->BravoWinGame9->isChecked()) count++;
         ui->Team2Score->setValue(count);
     } else {
         ui->Team1Score->setDisabled(false);
@@ -780,16 +843,16 @@ void MainWindow::on_UpdateRoundCheckbox_stateChanged(int arg1)
             ui->AlphaWinGame1, ui->AlphaWinGame2, ui->AlphaWinGame3, ui->AlphaWinGame4,
             ui->AlphaWinGame5, ui->AlphaWinGame6, ui->AlphaWinGame7, ui->AlphaWinGame8, ui->AlphaWinGame9
         };
-        QCheckBox *betaGames[9] = {
-            ui->BetaWinGame1, ui->BetaWinGame2, ui->BetaWinGame3, ui->BetaWinGame4,
-            ui->BetaWinGame5, ui->BetaWinGame6, ui->BetaWinGame7, ui->BetaWinGame8, ui->BetaWinGame9
+        QCheckBox *bravoGames[9] = {
+            ui->BravoWinGame1, ui->BravoWinGame2, ui->BravoWinGame3, ui->BravoWinGame4,
+            ui->BravoWinGame5, ui->BravoWinGame6, ui->BravoWinGame7, ui->BravoWinGame8, ui->BravoWinGame9
         };
         QRadioButton *rounds[9] = {
             ui->RadioGame1, ui->RadioGame2, ui->RadioGame3, ui->RadioGame4,
             ui->RadioGame5, ui->RadioGame6, ui->RadioGame7, ui->RadioGame8, ui->RadioGame9
         };
         for (int i = 0; i < 9; i++) {
-            if (!alphaGames[i]->isChecked() && !betaGames[i]->isChecked()) {
+            if (!alphaGames[i]->isChecked() && !bravoGames[i]->isChecked()) {
                 currentGame = rounds[i];
                 break;
             }
@@ -1171,120 +1234,274 @@ void MainWindow::handleWinner(QCheckBox *WinGame, QCheckBox *OpponentWinGame, QS
 void MainWindow::on_AlphaWinGame1_clicked()
 {
     MainWindow::clickedFunction function = &MainWindow::on_RadioGame2_clicked;
-    handleWinner(ui->AlphaWinGame1, ui->BetaWinGame1, ui->Team1Score, ui->Team2Score, "/teamAlpha/", ui->RadioGame1, ui->RadioGame2, function);
+    handleWinner(ui->AlphaWinGame1, ui->BravoWinGame1, ui->Team1Score, ui->Team2Score, "/teamAlpha/", ui->RadioGame1, ui->RadioGame2, function);
 }
 
 void MainWindow::on_AlphaWinGame2_clicked()
 {
     MainWindow::clickedFunction function = &MainWindow::on_RadioGame3_clicked;
-    handleWinner(ui->AlphaWinGame2, ui->BetaWinGame2, ui->Team1Score, ui->Team2Score, "/teamAlpha/", ui->RadioGame2, ui->RadioGame3, function);
+    handleWinner(ui->AlphaWinGame2, ui->BravoWinGame2, ui->Team1Score, ui->Team2Score, "/teamAlpha/", ui->RadioGame2, ui->RadioGame3, function);
 }
 
 void MainWindow::on_AlphaWinGame3_clicked()
 {
     MainWindow::clickedFunction function = &MainWindow::on_RadioGame4_clicked;
-    handleWinner(ui->AlphaWinGame3, ui->BetaWinGame3, ui->Team1Score, ui->Team2Score, "/teamAlpha/", ui->RadioGame3, ui->RadioGame4, function);
+    handleWinner(ui->AlphaWinGame3, ui->BravoWinGame3, ui->Team1Score, ui->Team2Score, "/teamAlpha/", ui->RadioGame3, ui->RadioGame4, function);
 }
 
 void MainWindow::on_AlphaWinGame4_clicked()
 {
     MainWindow::clickedFunction function = &MainWindow::on_RadioGame5_clicked;
-    handleWinner(ui->AlphaWinGame4, ui->BetaWinGame4, ui->Team1Score, ui->Team2Score, "/teamAlpha/", ui->RadioGame4, ui->RadioGame5, function);
+    handleWinner(ui->AlphaWinGame4, ui->BravoWinGame4, ui->Team1Score, ui->Team2Score, "/teamAlpha/", ui->RadioGame4, ui->RadioGame5, function);
 }
 
 void MainWindow::on_AlphaWinGame5_clicked()
 {
     MainWindow::clickedFunction function = &MainWindow::on_RadioGame6_clicked;
-    handleWinner(ui->AlphaWinGame5, ui->BetaWinGame5, ui->Team1Score, ui->Team2Score, "/teamAlpha/", ui->RadioGame5, ui->RadioGame6, function);
+    handleWinner(ui->AlphaWinGame5, ui->BravoWinGame5, ui->Team1Score, ui->Team2Score, "/teamAlpha/", ui->RadioGame5, ui->RadioGame6, function);
 }
 
 void MainWindow::on_AlphaWinGame6_clicked()
 {
     MainWindow::clickedFunction function = &MainWindow::on_RadioGame7_clicked;
-    handleWinner(ui->AlphaWinGame6, ui->BetaWinGame6, ui->Team1Score, ui->Team2Score, "/teamAlpha/", ui->RadioGame6, ui->RadioGame7, function);
+    handleWinner(ui->AlphaWinGame6, ui->BravoWinGame6, ui->Team1Score, ui->Team2Score, "/teamAlpha/", ui->RadioGame6, ui->RadioGame7, function);
 }
 
 void MainWindow::on_AlphaWinGame7_clicked()
 {
     MainWindow::clickedFunction function = &MainWindow::on_RadioGame8_clicked;
-    handleWinner(ui->AlphaWinGame7, ui->BetaWinGame7, ui->Team1Score, ui->Team2Score, "/teamAlpha/", ui->RadioGame7, ui->RadioGame8, function);
+    handleWinner(ui->AlphaWinGame7, ui->BravoWinGame7, ui->Team1Score, ui->Team2Score, "/teamAlpha/", ui->RadioGame7, ui->RadioGame8, function);
 }
 
 void MainWindow::on_AlphaWinGame8_clicked()
 {
     MainWindow::clickedFunction function = &MainWindow::on_RadioGame9_clicked;
-    handleWinner(ui->AlphaWinGame8, ui->BetaWinGame8, ui->Team1Score, ui->Team2Score, "/teamAlpha/", ui->RadioGame8, ui->RadioGame9, function);
+    handleWinner(ui->AlphaWinGame8, ui->BravoWinGame8, ui->Team1Score, ui->Team2Score, "/teamAlpha/", ui->RadioGame8, ui->RadioGame9, function);
 }
 
 void MainWindow::on_AlphaWinGame9_clicked()
 {
     MainWindow::clickedFunction function = &MainWindow::on_RadioGame9_clicked;
-    handleWinner(ui->AlphaWinGame9, ui->BetaWinGame9, ui->Team1Score, ui->Team2Score, "/teamAlpha/", ui->RadioGame9, ui->RadioGame9, function);
+    handleWinner(ui->AlphaWinGame9, ui->BravoWinGame9, ui->Team1Score, ui->Team2Score, "/teamAlpha/", ui->RadioGame9, ui->RadioGame9, function);
 }
 
-void MainWindow::on_BetaWinGame1_clicked()
+void MainWindow::on_BravoWinGame1_clicked()
 {
     MainWindow::clickedFunction function = &MainWindow::on_RadioGame2_clicked;
-    handleWinner(ui->BetaWinGame1, ui->AlphaWinGame1, ui->Team2Score, ui->Team1Score, "/teamBeta/", ui->RadioGame1, ui->RadioGame2, function);
+    handleWinner(ui->BravoWinGame1, ui->AlphaWinGame1, ui->Team2Score, ui->Team1Score, "/teamBravo/", ui->RadioGame1, ui->RadioGame2, function);
 }
 
-void MainWindow::on_BetaWinGame2_clicked()
+void MainWindow::on_BravoWinGame2_clicked()
 {
     MainWindow::clickedFunction function = &MainWindow::on_RadioGame3_clicked;
-    handleWinner(ui->BetaWinGame2, ui->AlphaWinGame2, ui->Team2Score, ui->Team1Score, "/teamBeta/", ui->RadioGame2, ui->RadioGame3, function);
+    handleWinner(ui->BravoWinGame2, ui->AlphaWinGame2, ui->Team2Score, ui->Team1Score, "/teamBravo/", ui->RadioGame2, ui->RadioGame3, function);
 }
 
-void MainWindow::on_BetaWinGame3_clicked()
+void MainWindow::on_BravoWinGame3_clicked()
 {
     MainWindow::clickedFunction function = &MainWindow::on_RadioGame4_clicked;
-    handleWinner(ui->BetaWinGame3, ui->AlphaWinGame3, ui->Team2Score, ui->Team1Score, "/teamBeta/", ui->RadioGame3, ui->RadioGame4, function);
+    handleWinner(ui->BravoWinGame3, ui->AlphaWinGame3, ui->Team2Score, ui->Team1Score, "/teamBravo/", ui->RadioGame3, ui->RadioGame4, function);
 }
 
-void MainWindow::on_BetaWinGame4_clicked()
+void MainWindow::on_BravoWinGame4_clicked()
 {
     MainWindow::clickedFunction function = &MainWindow::on_RadioGame5_clicked;
-    handleWinner(ui->BetaWinGame4, ui->AlphaWinGame4, ui->Team2Score, ui->Team1Score, "/teamBeta/", ui->RadioGame4, ui->RadioGame5, function);
+    handleWinner(ui->BravoWinGame4, ui->AlphaWinGame4, ui->Team2Score, ui->Team1Score, "/teamBravo/", ui->RadioGame4, ui->RadioGame5, function);
 }
 
-void MainWindow::on_BetaWinGame5_clicked()
+void MainWindow::on_BravoWinGame5_clicked()
 {
     MainWindow::clickedFunction function = &MainWindow::on_RadioGame6_clicked;
-    handleWinner(ui->BetaWinGame5, ui->AlphaWinGame5, ui->Team2Score, ui->Team1Score, "/teamBeta/", ui->RadioGame5, ui->RadioGame6, function);
+    handleWinner(ui->BravoWinGame5, ui->AlphaWinGame5, ui->Team2Score, ui->Team1Score, "/teamBravo/", ui->RadioGame5, ui->RadioGame6, function);
 }
 
-void MainWindow::on_BetaWinGame6_clicked()
+void MainWindow::on_BravoWinGame6_clicked()
 {
     MainWindow::clickedFunction function = &MainWindow::on_RadioGame7_clicked;
-    handleWinner(ui->BetaWinGame6, ui->AlphaWinGame6, ui->Team2Score, ui->Team1Score, "/teamBeta/", ui->RadioGame6, ui->RadioGame7, function);
+    handleWinner(ui->BravoWinGame6, ui->AlphaWinGame6, ui->Team2Score, ui->Team1Score, "/teamBravo/", ui->RadioGame6, ui->RadioGame7, function);
 }
 
-void MainWindow::on_BetaWinGame7_clicked()
+void MainWindow::on_BravoWinGame7_clicked()
 {
     MainWindow::clickedFunction function = &MainWindow::on_RadioGame8_clicked;
-    handleWinner(ui->BetaWinGame7, ui->AlphaWinGame7, ui->Team2Score, ui->Team1Score, "/teamBeta/", ui->RadioGame7, ui->RadioGame8, function);
+    handleWinner(ui->BravoWinGame7, ui->AlphaWinGame7, ui->Team2Score, ui->Team1Score, "/teamBravo/", ui->RadioGame7, ui->RadioGame8, function);
 }
 
-void MainWindow::on_BetaWinGame8_clicked()
+void MainWindow::on_BravoWinGame8_clicked()
 {
     MainWindow::clickedFunction function = &MainWindow::on_RadioGame9_clicked;
-    handleWinner(ui->BetaWinGame8, ui->AlphaWinGame8, ui->Team2Score, ui->Team1Score, "/teamBeta/", ui->RadioGame8, ui->RadioGame9, function);
+    handleWinner(ui->BravoWinGame8, ui->AlphaWinGame8, ui->Team2Score, ui->Team1Score, "/teamBravo/", ui->RadioGame8, ui->RadioGame9, function);
 }
 
-void MainWindow::on_BetaWinGame9_clicked()
+void MainWindow::on_BravoWinGame9_clicked()
 {
     MainWindow::clickedFunction function = &MainWindow::on_RadioGame9_clicked;
-    handleWinner(ui->BetaWinGame9, ui->AlphaWinGame9, ui->Team2Score, ui->Team1Score, "/teamBeta/", ui->RadioGame9, ui->RadioGame9, function);
+    handleWinner(ui->BravoWinGame9, ui->AlphaWinGame9, ui->Team2Score, ui->Team1Score, "/teamBravo/", ui->RadioGame9, ui->RadioGame9, function);
 }
 
 /*
 / END Set Section
 */
 
+QMap<QString, QLabel*> MainWindow::weapons_init()
+{
+    connect(ui->WeaponsResetAlpha, &QPushButton::clicked, this, &MainWindow::resetFields);
+    connect(ui->WeaponsResetBravo, &QPushButton::clicked, this, &MainWindow::resetFields);
+
+    connect(ui->WeaponsR1_1, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR1_2, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR1_3, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR1_4, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR2_1, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR2_2, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR2_3, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR2_4, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR3_1, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR3_2, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR3_3, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR3_4, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR4_1, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR4_2, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR4_3, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR4_4, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR5_1, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR5_2, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR5_3, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR5_4, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR6_1, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR6_2, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR6_3, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR6_4, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR7_1, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR7_2, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR7_3, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR7_4, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR8_1, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR8_2, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR8_3, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR8_4, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR9_1, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR9_2, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR9_3, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR9_4, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR1_5, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR1_6, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR1_7, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR1_8, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR2_5, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR2_6, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR2_7, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR2_8, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR3_5, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR3_6, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR3_7, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR3_8, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR4_5, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR4_6, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR4_7, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR4_8, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR5_5, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR5_6, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR5_7, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR5_8, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR6_5, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR6_6, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR6_7, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR6_8, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR7_5, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR7_6, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR7_7, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR7_8, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR8_5, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR8_6, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR8_7, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR8_8, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR9_5, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR9_6, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR9_7, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    connect(ui->WeaponsR9_8, &QLineEdit::editingFinished, this, &MainWindow::updateWeapon);
+    QMap<QString, QLabel*> labels{
+        {ui->WeaponsR1_1->objectName(), ui->WeaponLabelR1_1},
+        {ui->WeaponsR1_2->objectName(), ui->WeaponLabelR1_2},
+        {ui->WeaponsR1_3->objectName(), ui->WeaponLabelR1_3},
+        {ui->WeaponsR1_4->objectName(), ui->WeaponLabelR1_4},
+        {ui->WeaponsR2_1->objectName(), ui->WeaponLabelR2_1},
+        {ui->WeaponsR2_2->objectName(), ui->WeaponLabelR2_2},
+        {ui->WeaponsR2_3->objectName(), ui->WeaponLabelR2_3},
+        {ui->WeaponsR2_4->objectName(), ui->WeaponLabelR2_4},
+        {ui->WeaponsR3_1->objectName(), ui->WeaponLabelR3_1},
+        {ui->WeaponsR3_2->objectName(), ui->WeaponLabelR3_2},
+        {ui->WeaponsR3_3->objectName(), ui->WeaponLabelR3_3},
+        {ui->WeaponsR3_4->objectName(), ui->WeaponLabelR3_4},
+        {ui->WeaponsR4_1->objectName(), ui->WeaponLabelR4_1},
+        {ui->WeaponsR4_2->objectName(), ui->WeaponLabelR4_2},
+        {ui->WeaponsR4_3->objectName(), ui->WeaponLabelR4_3},
+        {ui->WeaponsR4_4->objectName(), ui->WeaponLabelR4_4},
+        {ui->WeaponsR5_1->objectName(), ui->WeaponLabelR5_1},
+        {ui->WeaponsR5_2->objectName(), ui->WeaponLabelR5_2},
+        {ui->WeaponsR5_3->objectName(), ui->WeaponLabelR5_3},
+        {ui->WeaponsR5_4->objectName(), ui->WeaponLabelR5_4},
+        {ui->WeaponsR6_1->objectName(), ui->WeaponLabelR6_1},
+        {ui->WeaponsR6_2->objectName(), ui->WeaponLabelR6_2},
+        {ui->WeaponsR6_3->objectName(), ui->WeaponLabelR6_3},
+        {ui->WeaponsR6_4->objectName(), ui->WeaponLabelR6_4},
+        {ui->WeaponsR7_1->objectName(), ui->WeaponLabelR7_1},
+        {ui->WeaponsR7_2->objectName(), ui->WeaponLabelR7_2},
+        {ui->WeaponsR7_3->objectName(), ui->WeaponLabelR7_3},
+        {ui->WeaponsR7_4->objectName(), ui->WeaponLabelR7_4},
+        {ui->WeaponsR8_1->objectName(), ui->WeaponLabelR8_1},
+        {ui->WeaponsR8_2->objectName(), ui->WeaponLabelR8_2},
+        {ui->WeaponsR8_3->objectName(), ui->WeaponLabelR8_3},
+        {ui->WeaponsR8_4->objectName(), ui->WeaponLabelR8_4},
+        {ui->WeaponsR9_1->objectName(), ui->WeaponLabelR9_1},
+        {ui->WeaponsR9_2->objectName(), ui->WeaponLabelR9_2},
+        {ui->WeaponsR9_3->objectName(), ui->WeaponLabelR9_3},
+        {ui->WeaponsR9_4->objectName(), ui->WeaponLabelR9_4},
+        {ui->WeaponsR1_5->objectName(), ui->WeaponLabelR1_5},
+        {ui->WeaponsR1_6->objectName(), ui->WeaponLabelR1_6},
+        {ui->WeaponsR1_7->objectName(), ui->WeaponLabelR1_7},
+        {ui->WeaponsR1_8->objectName(), ui->WeaponLabelR1_8},
+        {ui->WeaponsR2_5->objectName(), ui->WeaponLabelR2_5},
+        {ui->WeaponsR2_6->objectName(), ui->WeaponLabelR2_6},
+        {ui->WeaponsR2_7->objectName(), ui->WeaponLabelR2_7},
+        {ui->WeaponsR2_8->objectName(), ui->WeaponLabelR2_8},
+        {ui->WeaponsR3_5->objectName(), ui->WeaponLabelR3_5},
+        {ui->WeaponsR3_6->objectName(), ui->WeaponLabelR3_6},
+        {ui->WeaponsR3_7->objectName(), ui->WeaponLabelR3_7},
+        {ui->WeaponsR3_8->objectName(), ui->WeaponLabelR3_8},
+        {ui->WeaponsR4_5->objectName(), ui->WeaponLabelR4_5},
+        {ui->WeaponsR4_6->objectName(), ui->WeaponLabelR4_6},
+        {ui->WeaponsR4_7->objectName(), ui->WeaponLabelR4_7},
+        {ui->WeaponsR4_8->objectName(), ui->WeaponLabelR4_8},
+        {ui->WeaponsR5_5->objectName(), ui->WeaponLabelR5_5},
+        {ui->WeaponsR5_6->objectName(), ui->WeaponLabelR5_6},
+        {ui->WeaponsR5_7->objectName(), ui->WeaponLabelR5_7},
+        {ui->WeaponsR5_8->objectName(), ui->WeaponLabelR5_8},
+        {ui->WeaponsR6_5->objectName(), ui->WeaponLabelR6_5},
+        {ui->WeaponsR6_6->objectName(), ui->WeaponLabelR6_6},
+        {ui->WeaponsR6_7->objectName(), ui->WeaponLabelR6_7},
+        {ui->WeaponsR6_8->objectName(), ui->WeaponLabelR6_8},
+        {ui->WeaponsR7_5->objectName(), ui->WeaponLabelR7_5},
+        {ui->WeaponsR7_6->objectName(), ui->WeaponLabelR7_6},
+        {ui->WeaponsR7_7->objectName(), ui->WeaponLabelR7_7},
+        {ui->WeaponsR7_8->objectName(), ui->WeaponLabelR7_8},
+        {ui->WeaponsR8_5->objectName(), ui->WeaponLabelR8_5},
+        {ui->WeaponsR8_6->objectName(), ui->WeaponLabelR8_6},
+        {ui->WeaponsR8_7->objectName(), ui->WeaponLabelR8_7},
+        {ui->WeaponsR8_8->objectName(), ui->WeaponLabelR8_8},
+        {ui->WeaponsR9_5->objectName(), ui->WeaponLabelR9_5},
+        {ui->WeaponsR9_6->objectName(), ui->WeaponLabelR9_6},
+        {ui->WeaponsR9_7->objectName(), ui->WeaponLabelR9_7},
+        {ui->WeaponsR9_8->objectName(), ui->WeaponLabelR9_8}
+    };
+    return labels;
+}
+
 QMap<QString, MyWidget*> MainWindow::widgets_init()
 {
     QString filenames[] = {
-        "name.txt", "region", "logo", "color", "score.txt", "name.txt",
-        "region", "logo", "color", "score.txt", "title.txt", "subtitle.txt", "twitter.txt",
+        "name.txt", "logo", "color", "score.txt", "name.txt",
+        "logo", "color", "score.txt", "title.txt", "subtitle.txt", "twitter.txt",
         "message.txt", "tournamentLogo", "1Name.txt", "2Name.txt", "3Name.txt", "1Twitter.txt",
         "2Twitter.txt", "3Twitter.txt", "round.txt", "colorGroups", "color", "1",
         "2", "3", "4", "5", "6", "7",
@@ -1297,8 +1514,8 @@ QMap<QString, MyWidget*> MainWindow::widgets_init()
         "8", "9"
     };
     QString importDirs[] = {
-        "/teamAlpha/", "/teamAlpha/", "/teamAlpha/", "/teamAlpha/", "/teamAlpha/", "/teamBeta/",
-        "/teamBeta/", "/teamBeta/", "/teamBeta/", "/teamBeta/", "/info/", "/info/", "/info/",
+        "/teamAlpha/", "/teamAlpha/", "/teamAlpha/", "/teamAlpha/", "/teamBravo/",
+        "/teamBravo/", "/teamBravo/", "/teamBravo/", "/info/", "/info/", "/info/",
         "/info/", "/info/", "/casters/", "/casters/", "/casters/", "/casters/",
         "/casters/", "/casters/", "/round/", "/round/", "/round/", "/set/winners/",
         "/set/winners/", "/set/winners/", "/set/winners/", "/set/winners/", "/set/winners/", "/set/winners/",
@@ -1312,29 +1529,29 @@ QMap<QString, MyWidget*> MainWindow::widgets_init()
     };
     MyWidget *arr[widAmount];
     arr[0] = new LineEditWidget(importDirs[0], filenames[0]);
-    arr[1] = new ComboBoxWidget(importDirs[1], filenames[1]);
+    arr[1] = new LabelWidget(importDirs[1], filenames[1]);
     arr[2] = new LabelWidget(importDirs[2], filenames[2]);
-    arr[3] = new LabelWidget(importDirs[3], filenames[3]);
-    arr[4] = new SpinBoxWidget(importDirs[4], filenames[4]);
-    arr[5] = new LineEditWidget(importDirs[5], filenames[5]);
-    arr[6] = new ComboBoxWidget(importDirs[6], filenames[6]);
-    arr[7] = new LabelWidget(importDirs[7], filenames[7]);
-    arr[8] = new LabelWidget(importDirs[8], filenames[8]);
-    arr[9] = new SpinBoxWidget(importDirs[9], filenames[9]);
+    arr[3] = new SpinBoxWidget(importDirs[3], filenames[3]);
+    arr[4] = new LineEditWidget(importDirs[4], filenames[4]);
+    arr[5] = new LabelWidget(importDirs[5], filenames[5]);
+    arr[6] = new LabelWidget(importDirs[6], filenames[6]);
+    arr[7] = new SpinBoxWidget(importDirs[7], filenames[7]);
+    arr[8] = new LineEditWidget(importDirs[8], filenames[8]);
+    arr[9] = new LineEditWidget(importDirs[9], filenames[9]);
     arr[10] = new LineEditWidget(importDirs[10], filenames[10]);
-    arr[11] = new LineEditWidget(importDirs[11], filenames[11]);
-    arr[12] = new LineEditWidget(importDirs[12], filenames[12]);
-    arr[13] = new PlainTextWidget(importDirs[13], filenames[13]);
-    arr[14] = new ComboBoxWidget(importDirs[14], filenames[14]);
+    arr[11] = new PlainTextWidget(importDirs[11], filenames[11]);
+    arr[12] = new ComboBoxWidget(importDirs[12], filenames[12]);
+    arr[13] = new LineEditWidget(importDirs[13], filenames[13]);
+    arr[14] = new LineEditWidget(importDirs[14], filenames[14]);
     arr[15] = new LineEditWidget(importDirs[15], filenames[15]);
     arr[16] = new LineEditWidget(importDirs[16], filenames[16]);
     arr[17] = new LineEditWidget(importDirs[17], filenames[17]);
     arr[18] = new LineEditWidget(importDirs[18], filenames[18]);
     arr[19] = new LineEditWidget(importDirs[19], filenames[19]);
-    arr[20] = new LineEditWidget(importDirs[20], filenames[20]);
-    arr[21] = new LineEditWidget(importDirs[21], filenames[21]);
-    arr[22] = new ComboBoxWidget(importDirs[22], filenames[22]);
-    arr[23] = new ComboBoxWidget(importDirs[23], filenames[23]);
+    arr[20] = new ComboBoxWidget(importDirs[20], filenames[20]);
+    arr[21] = new ComboBoxWidget(importDirs[21], filenames[21]);
+    arr[22] = new CheckBoxWidget(importDirs[22], filenames[22]);
+    arr[23] = new CheckBoxWidget(importDirs[23], filenames[23]);
     arr[24] = new CheckBoxWidget(importDirs[24], filenames[24]);
     arr[25] = new CheckBoxWidget(importDirs[25], filenames[25]);
     arr[26] = new CheckBoxWidget(importDirs[26], filenames[26]);
@@ -1351,8 +1568,8 @@ QMap<QString, MyWidget*> MainWindow::widgets_init()
     arr[37] = new CheckBoxWidget(importDirs[37], filenames[37]);
     arr[38] = new CheckBoxWidget(importDirs[38], filenames[38]);
     arr[39] = new CheckBoxWidget(importDirs[39], filenames[39]);
-    arr[40] = new CheckBoxWidget(importDirs[40], filenames[40]);
-    arr[41] = new CheckBoxWidget(importDirs[41], filenames[41]);
+    arr[40] = new RadioButtonWidget(importDirs[40], filenames[40]);
+    arr[41] = new RadioButtonWidget(importDirs[41], filenames[41]);
     arr[42] = new RadioButtonWidget(importDirs[42], filenames[42]);
     arr[43] = new RadioButtonWidget(importDirs[43], filenames[43]);
     arr[44] = new RadioButtonWidget(importDirs[44], filenames[44]);
@@ -1360,8 +1577,8 @@ QMap<QString, MyWidget*> MainWindow::widgets_init()
     arr[46] = new RadioButtonWidget(importDirs[46], filenames[46]);
     arr[47] = new RadioButtonWidget(importDirs[47], filenames[47]);
     arr[48] = new RadioButtonWidget(importDirs[48], filenames[48]);
-    arr[49] = new RadioButtonWidget(importDirs[49], filenames[49]);
-    arr[50] = new RadioButtonWidget(importDirs[50], filenames[50]);
+    arr[49] = new LineEditWidget(importDirs[49], filenames[49]);
+    arr[50] = new LineEditWidget(importDirs[50], filenames[50]);
     arr[51] = new LineEditWidget(importDirs[51], filenames[51]);
     arr[52] = new LineEditWidget(importDirs[52], filenames[52]);
     arr[53] = new LineEditWidget(importDirs[53], filenames[53]);
@@ -1369,8 +1586,8 @@ QMap<QString, MyWidget*> MainWindow::widgets_init()
     arr[55] = new LineEditWidget(importDirs[55], filenames[55]);
     arr[56] = new LineEditWidget(importDirs[56], filenames[56]);
     arr[57] = new LineEditWidget(importDirs[57], filenames[57]);
-    arr[58] = new LineEditWidget(importDirs[58], filenames[58]);
-    arr[59] = new LineEditWidget(importDirs[59], filenames[59]);
+    arr[58] = new ComboBoxWidget(importDirs[58], filenames[58]);
+    arr[59] = new ComboBoxWidget(importDirs[59], filenames[59]);
     arr[60] = new ComboBoxWidget(importDirs[60], filenames[60]);
     arr[61] = new ComboBoxWidget(importDirs[61], filenames[61]);
     arr[62] = new ComboBoxWidget(importDirs[62], filenames[62]);
@@ -1378,78 +1595,146 @@ QMap<QString, MyWidget*> MainWindow::widgets_init()
     arr[64] = new ComboBoxWidget(importDirs[64], filenames[64]);
     arr[65] = new ComboBoxWidget(importDirs[65], filenames[65]);
     arr[66] = new ComboBoxWidget(importDirs[66], filenames[66]);
-    arr[67] = new ComboBoxWidget(importDirs[67], filenames[67]);
-    arr[68] = new ComboBoxWidget(importDirs[68], filenames[68]);    
     QMap<QString, MyWidget*> widgets{
         {ui->Team1NameEdit ->objectName(), arr[0]},
-        {ui->Team1RegionCombo ->objectName(), arr[1]},
-        {ui->Team1Logo ->objectName(), arr[2]},
-        {ui->Team1Color ->objectName(), arr[3]},
-        {ui->Team1Score ->objectName(), arr[4]},
-        {ui->Team2NameEdit ->objectName(), arr[5]},
-        {ui->Team2RegionCombo ->objectName(), arr[6]},
-        {ui->Team2Logo ->objectName(), arr[7]},
-        {ui->Team2Color ->objectName(), arr[8]},
-        {ui->Team2Score ->objectName(), arr[9]},
-        {ui->TitleEdit ->objectName(), arr[10]},
-        {ui->SubtitleEdit ->objectName(), arr[11]},
-        {ui->TwitterEdit ->objectName(), arr[12]},
-        {ui->MessageEdit ->objectName(), arr[13]},
-        {ui->LogoCombo ->objectName(), arr[14]},
-        {ui->Caster1NameEdit ->objectName(), arr[15]},
-        {ui->Caster2NameEdit ->objectName(), arr[16]},
-        {ui->Caster3NameEdit ->objectName(), arr[17]},
-        {ui->Caster1TwitterEdit ->objectName(), arr[18]},
-        {ui->Caster2TwitterEdit ->objectName(), arr[19]},
-        {ui->Caster3TwitterEdit ->objectName(), arr[20]},
-        {ui->RoundEdit ->objectName(), arr[21]},
-        {ui->ColorGroupCombo ->objectName(), arr[22]},
-        {ui->ColorsCombo ->objectName(), arr[23]},
-        {ui->AlphaWinGame1 ->objectName(), arr[24]},
-        {ui->AlphaWinGame2 ->objectName(), arr[25]},
-        {ui->AlphaWinGame3 ->objectName(), arr[26]},
-        {ui->AlphaWinGame4 ->objectName(), arr[27]},
-        {ui->AlphaWinGame5 ->objectName(), arr[28]},
-        {ui->AlphaWinGame6 ->objectName(), arr[29]},
-        {ui->AlphaWinGame7 ->objectName(), arr[30]},
-        {ui->AlphaWinGame8 ->objectName(), arr[31]},
-        {ui->AlphaWinGame9 ->objectName(), arr[32]},
-        {ui->BetaWinGame1 ->objectName(), arr[33]},
-        {ui->BetaWinGame2 ->objectName(), arr[34]},
-        {ui->BetaWinGame3 ->objectName(), arr[35]},
-        {ui->BetaWinGame4 ->objectName(), arr[36]},
-        {ui->BetaWinGame5 ->objectName(), arr[37]},
-        {ui->BetaWinGame6 ->objectName(), arr[38]},
-        {ui->BetaWinGame7 ->objectName(), arr[39]},
-        {ui->BetaWinGame8 ->objectName(), arr[40]},
-        {ui->BetaWinGame9 ->objectName(), arr[41]},
-        {ui->RadioGame1 ->objectName(), arr[42]},
-        {ui->RadioGame2 ->objectName(), arr[43]},
-        {ui->RadioGame3 ->objectName(), arr[44]},
-        {ui->RadioGame4 ->objectName(), arr[45]},
-        {ui->RadioGame5 ->objectName(), arr[46]},
-        {ui->RadioGame6 ->objectName(), arr[47]},
-        {ui->RadioGame7 ->objectName(), arr[48]},
-        {ui->RadioGame8 ->objectName(), arr[49]},
-        {ui->RadioGame9 ->objectName(), arr[50]},
-        {ui->MapComboGame1 ->objectName(), arr[51]},
-        {ui->MapComboGame2 ->objectName(), arr[52]},
-        {ui->MapComboGame3 ->objectName(), arr[53]},
-        {ui->MapComboGame4 ->objectName(), arr[54]},
-        {ui->MapComboGame5 ->objectName(), arr[55]},
-        {ui->MapComboGame6 ->objectName(), arr[56]},
-        {ui->MapComboGame7 ->objectName(), arr[57]},
-        {ui->MapComboGame8 ->objectName(), arr[58]},
-        {ui->MapComboGame9 ->objectName(), arr[59]},
-        {ui->ModeComboGame1 ->objectName(), arr[60]},
-        {ui->ModeComboGame2 ->objectName(), arr[61]},
-        {ui->ModeComboGame3 ->objectName(), arr[62]},
-        {ui->ModeComboGame4 ->objectName(), arr[63]},
-        {ui->ModeComboGame5 ->objectName(), arr[64]},
-        {ui->ModeComboGame6 ->objectName(), arr[65]},
-        {ui->ModeComboGame7 ->objectName(), arr[66]},
-        {ui->ModeComboGame8 ->objectName(), arr[67]},
-        {ui->ModeComboGame9 ->objectName(), arr[68]}
+        {ui->Team1Logo ->objectName(), arr[1]},
+        {ui->Team1Color ->objectName(), arr[2]},
+        {ui->Team1Score ->objectName(), arr[3]},
+        {ui->Team2NameEdit ->objectName(), arr[4]},
+        {ui->Team2Logo ->objectName(), arr[5]},
+        {ui->Team2Color ->objectName(), arr[6]},
+        {ui->Team2Score ->objectName(), arr[7]},
+        {ui->TitleEdit ->objectName(), arr[8]},
+        {ui->SubtitleEdit ->objectName(), arr[9]},
+        {ui->TwitterEdit ->objectName(), arr[10]},
+        {ui->MessageEdit ->objectName(), arr[11]},
+        {ui->LogoCombo ->objectName(), arr[12]},
+        {ui->Caster1NameEdit ->objectName(), arr[13]},
+        {ui->Caster2NameEdit ->objectName(), arr[14]},
+        {ui->Caster3NameEdit ->objectName(), arr[15]},
+        {ui->Caster1TwitterEdit ->objectName(), arr[16]},
+        {ui->Caster2TwitterEdit ->objectName(), arr[17]},
+        {ui->Caster3TwitterEdit ->objectName(), arr[18]},
+        {ui->RoundEdit ->objectName(), arr[19]},
+        {ui->ColorGroupCombo ->objectName(), arr[20]},
+        {ui->ColorsCombo ->objectName(), arr[21]},
+        {ui->AlphaWinGame1 ->objectName(), arr[22]},
+        {ui->AlphaWinGame2 ->objectName(), arr[23]},
+        {ui->AlphaWinGame3 ->objectName(), arr[24]},
+        {ui->AlphaWinGame4 ->objectName(), arr[25]},
+        {ui->AlphaWinGame5 ->objectName(), arr[26]},
+        {ui->AlphaWinGame6 ->objectName(), arr[27]},
+        {ui->AlphaWinGame7 ->objectName(), arr[28]},
+        {ui->AlphaWinGame8 ->objectName(), arr[29]},
+        {ui->AlphaWinGame9 ->objectName(), arr[30]},
+        {ui->BravoWinGame1 ->objectName(), arr[31]},
+        {ui->BravoWinGame2 ->objectName(), arr[32]},
+        {ui->BravoWinGame3 ->objectName(), arr[33]},
+        {ui->BravoWinGame4 ->objectName(), arr[34]},
+        {ui->BravoWinGame5 ->objectName(), arr[35]},
+        {ui->BravoWinGame6 ->objectName(), arr[36]},
+        {ui->BravoWinGame7 ->objectName(), arr[37]},
+        {ui->BravoWinGame8 ->objectName(), arr[38]},
+        {ui->BravoWinGame9 ->objectName(), arr[39]},
+        {ui->RadioGame1 ->objectName(), arr[40]},
+        {ui->RadioGame2 ->objectName(), arr[41]},
+        {ui->RadioGame3 ->objectName(), arr[42]},
+        {ui->RadioGame4 ->objectName(), arr[43]},
+        {ui->RadioGame5 ->objectName(), arr[44]},
+        {ui->RadioGame6 ->objectName(), arr[45]},
+        {ui->RadioGame7 ->objectName(), arr[46]},
+        {ui->RadioGame8 ->objectName(), arr[47]},
+        {ui->RadioGame9 ->objectName(), arr[48]},
+        {ui->MapComboGame1 ->objectName(), arr[49]},
+        {ui->MapComboGame2 ->objectName(), arr[50]},
+        {ui->MapComboGame3 ->objectName(), arr[51]},
+        {ui->MapComboGame4 ->objectName(), arr[52]},
+        {ui->MapComboGame5 ->objectName(), arr[53]},
+        {ui->MapComboGame6 ->objectName(), arr[54]},
+        {ui->MapComboGame7 ->objectName(), arr[55]},
+        {ui->MapComboGame8 ->objectName(), arr[56]},
+        {ui->MapComboGame9 ->objectName(), arr[57]},
+        {ui->ModeComboGame1 ->objectName(), arr[58]},
+        {ui->ModeComboGame2 ->objectName(), arr[59]},
+        {ui->ModeComboGame3 ->objectName(), arr[60]},
+        {ui->ModeComboGame4 ->objectName(), arr[61]},
+        {ui->ModeComboGame5 ->objectName(), arr[62]},
+        {ui->ModeComboGame6 ->objectName(), arr[63]},
+        {ui->ModeComboGame7 ->objectName(), arr[64]},
+        {ui->ModeComboGame8 ->objectName(), arr[65]},
+        {ui->ModeComboGame9 ->objectName(), arr[66]},
+        {ui->WeaponsR1_1->objectName(), new LineEditWidget("/set/weapons/", "R1_1")},
+        {ui->WeaponsR1_2->objectName(), new LineEditWidget("/set/weapons/", "R1_2")},
+        {ui->WeaponsR1_3->objectName(), new LineEditWidget("/set/weapons/", "R1_3")},
+        {ui->WeaponsR1_4->objectName(), new LineEditWidget("/set/weapons/", "R1_4")},
+        {ui->WeaponsR2_1->objectName(), new LineEditWidget("/set/weapons/", "R2_1")},
+        {ui->WeaponsR2_2->objectName(), new LineEditWidget("/set/weapons/", "R2_2")},
+        {ui->WeaponsR2_3->objectName(), new LineEditWidget("/set/weapons/", "R2_3")},
+        {ui->WeaponsR2_4->objectName(), new LineEditWidget("/set/weapons/", "R2_4")},
+        {ui->WeaponsR3_1->objectName(), new LineEditWidget("/set/weapons/", "R3_1")},
+        {ui->WeaponsR3_2->objectName(), new LineEditWidget("/set/weapons/", "R3_2")},
+        {ui->WeaponsR3_3->objectName(), new LineEditWidget("/set/weapons/", "R3_3")},
+        {ui->WeaponsR3_4->objectName(), new LineEditWidget("/set/weapons/", "R3_4")},
+        {ui->WeaponsR4_1->objectName(), new LineEditWidget("/set/weapons/", "R4_1")},
+        {ui->WeaponsR4_2->objectName(), new LineEditWidget("/set/weapons/", "R4_2")},
+        {ui->WeaponsR4_3->objectName(), new LineEditWidget("/set/weapons/", "R4_3")},
+        {ui->WeaponsR4_4->objectName(), new LineEditWidget("/set/weapons/", "R4_4")},
+        {ui->WeaponsR5_1->objectName(), new LineEditWidget("/set/weapons/", "R5_1")},
+        {ui->WeaponsR5_2->objectName(), new LineEditWidget("/set/weapons/", "R5_2")},
+        {ui->WeaponsR5_3->objectName(), new LineEditWidget("/set/weapons/", "R5_3")},
+        {ui->WeaponsR5_4->objectName(), new LineEditWidget("/set/weapons/", "R5_4")},
+        {ui->WeaponsR6_1->objectName(), new LineEditWidget("/set/weapons/", "R6_1")},
+        {ui->WeaponsR6_2->objectName(), new LineEditWidget("/set/weapons/", "R6_2")},
+        {ui->WeaponsR6_3->objectName(), new LineEditWidget("/set/weapons/", "R6_3")},
+        {ui->WeaponsR6_4->objectName(), new LineEditWidget("/set/weapons/", "R6_4")},
+        {ui->WeaponsR7_1->objectName(), new LineEditWidget("/set/weapons/", "R7_1")},
+        {ui->WeaponsR7_2->objectName(), new LineEditWidget("/set/weapons/", "R7_2")},
+        {ui->WeaponsR7_3->objectName(), new LineEditWidget("/set/weapons/", "R7_3")},
+        {ui->WeaponsR7_4->objectName(), new LineEditWidget("/set/weapons/", "R7_4")},
+        {ui->WeaponsR8_1->objectName(), new LineEditWidget("/set/weapons/", "R8_1")},
+        {ui->WeaponsR8_2->objectName(), new LineEditWidget("/set/weapons/", "R8_2")},
+        {ui->WeaponsR8_3->objectName(), new LineEditWidget("/set/weapons/", "R8_3")},
+        {ui->WeaponsR8_4->objectName(), new LineEditWidget("/set/weapons/", "R8_4")},
+        {ui->WeaponsR9_1->objectName(), new LineEditWidget("/set/weapons/", "R9_1")},
+        {ui->WeaponsR9_2->objectName(), new LineEditWidget("/set/weapons/", "R9_2")},
+        {ui->WeaponsR9_3->objectName(), new LineEditWidget("/set/weapons/", "R9_3")},
+        {ui->WeaponsR9_4->objectName(), new LineEditWidget("/set/weapons/", "R9_4")},
+        {ui->WeaponsR1_5->objectName(), new LineEditWidget("/set/weapons/", "R1_5")},
+        {ui->WeaponsR1_6->objectName(), new LineEditWidget("/set/weapons/", "R1_6")},
+        {ui->WeaponsR1_7->objectName(), new LineEditWidget("/set/weapons/", "R1_7")},
+        {ui->WeaponsR1_8->objectName(), new LineEditWidget("/set/weapons/", "R1_8")},
+        {ui->WeaponsR2_5->objectName(), new LineEditWidget("/set/weapons/", "R2_5")},
+        {ui->WeaponsR2_6->objectName(), new LineEditWidget("/set/weapons/", "R2_6")},
+        {ui->WeaponsR2_7->objectName(), new LineEditWidget("/set/weapons/", "R2_7")},
+        {ui->WeaponsR2_8->objectName(), new LineEditWidget("/set/weapons/", "R2_8")},
+        {ui->WeaponsR3_5->objectName(), new LineEditWidget("/set/weapons/", "R3_5")},
+        {ui->WeaponsR3_6->objectName(), new LineEditWidget("/set/weapons/", "R3_6")},
+        {ui->WeaponsR3_7->objectName(), new LineEditWidget("/set/weapons/", "R3_7")},
+        {ui->WeaponsR3_8->objectName(), new LineEditWidget("/set/weapons/", "R3_8")},
+        {ui->WeaponsR4_5->objectName(), new LineEditWidget("/set/weapons/", "R4_5")},
+        {ui->WeaponsR4_6->objectName(), new LineEditWidget("/set/weapons/", "R4_6")},
+        {ui->WeaponsR4_7->objectName(), new LineEditWidget("/set/weapons/", "R4_7")},
+        {ui->WeaponsR4_8->objectName(), new LineEditWidget("/set/weapons/", "R4_8")},
+        {ui->WeaponsR5_5->objectName(), new LineEditWidget("/set/weapons/", "R5_5")},
+        {ui->WeaponsR5_6->objectName(), new LineEditWidget("/set/weapons/", "R5_6")},
+        {ui->WeaponsR5_7->objectName(), new LineEditWidget("/set/weapons/", "R5_7")},
+        {ui->WeaponsR5_8->objectName(), new LineEditWidget("/set/weapons/", "R5_8")},
+        {ui->WeaponsR6_5->objectName(), new LineEditWidget("/set/weapons/", "R6_5")},
+        {ui->WeaponsR6_6->objectName(), new LineEditWidget("/set/weapons/", "R6_6")},
+        {ui->WeaponsR6_7->objectName(), new LineEditWidget("/set/weapons/", "R6_7")},
+        {ui->WeaponsR6_8->objectName(), new LineEditWidget("/set/weapons/", "R6_8")},
+        {ui->WeaponsR7_5->objectName(), new LineEditWidget("/set/weapons/", "R7_5")},
+        {ui->WeaponsR7_6->objectName(), new LineEditWidget("/set/weapons/", "R7_6")},
+        {ui->WeaponsR7_7->objectName(), new LineEditWidget("/set/weapons/", "R7_7")},
+        {ui->WeaponsR7_8->objectName(), new LineEditWidget("/set/weapons/", "R7_8")},
+        {ui->WeaponsR8_5->objectName(), new LineEditWidget("/set/weapons/", "R8_5")},
+        {ui->WeaponsR8_6->objectName(), new LineEditWidget("/set/weapons/", "R8_6")},
+        {ui->WeaponsR8_7->objectName(), new LineEditWidget("/set/weapons/", "R8_7")},
+        {ui->WeaponsR8_8->objectName(), new LineEditWidget("/set/weapons/", "R8_8")},
+        {ui->WeaponsR9_5->objectName(), new LineEditWidget("/set/weapons/", "R9_5")},
+        {ui->WeaponsR9_6->objectName(), new LineEditWidget("/set/weapons/", "R9_6")},
+        {ui->WeaponsR9_7->objectName(), new LineEditWidget("/set/weapons/", "R9_7")},
+        {ui->WeaponsR9_8->objectName(), new LineEditWidget("/set/weapons/", "R9_8")},
     };
     return widgets;
 }
@@ -1500,43 +1785,35 @@ void MainWindow::on_SwapTeamsButton_clicked()
 {
     QString importDir = this->directoryFor["/ImportingFilesDirectory.txt"];
     QString defaultDir = this->directoryFor["/DefaultDirectory.txt"];
-    QString regionsDir = this->directoryFor["/RegionsDirectory.txt"];
     // Team Alpha
     QString alphaDir = this->directoryFor["/AlphaTeamDirectory.txt"];
     LineEditWidget *alphaName {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Team1NameEdit->objectName()])};
     LabelWidget *alphaLogo {dynamic_cast<LabelWidget *>(this->widgetFor[ui->Team1Logo->objectName()])};
     SpinBoxWidget *alphaScore {dynamic_cast<SpinBoxWidget *>(this->widgetFor[ui->Team1Score->objectName()])};
-    ComboBoxWidget *alphaRegion {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->Team1RegionCombo->objectName()])};
-    // Team Beta
-    QString betaDir = this->directoryFor["/BetaTeamDirectory.txt"];
-    LineEditWidget *betaName {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Team2NameEdit->objectName()])};
-    LabelWidget *betaLogo {dynamic_cast<LabelWidget *>(this->widgetFor[ui->Team2Logo->objectName()])};
-    SpinBoxWidget *betaScore {dynamic_cast<SpinBoxWidget *>(this->widgetFor[ui->Team2Score->objectName()])};
-    ComboBoxWidget *betaRegion {dynamic_cast<ComboBoxWidget *>(this->widgetFor[ui->Team2RegionCombo->objectName()])};
+    // Team Bravo
+    QString bravoDir = this->directoryFor["/BravoTeamDirectory.txt"];
+    LineEditWidget *bravoName {dynamic_cast<LineEditWidget *>(this->widgetFor[ui->Team2NameEdit->objectName()])};
+    LabelWidget *bravoLogo {dynamic_cast<LabelWidget *>(this->widgetFor[ui->Team2Logo->objectName()])};
+    SpinBoxWidget *bravoScore {dynamic_cast<SpinBoxWidget *>(this->widgetFor[ui->Team2Score->objectName()])};
     // Aux = Alpha
     QString auxName = ui->Team1NameEdit->text();
     int auxScore = ui->Team1Score->value();
-    int auxRegion = ui->Team1RegionCombo->currentIndex();
-    // Alpha = Beta
+    // Alpha = Bravo
     this->teamAlphaOptionalFiles = this->clearOptionalFiles(this->teamAlphaOptionalFiles, importDir + "/teamAlpha/");
     ui->Team1NameEdit->setText(ui->Team2NameEdit->text());
     ui->Team1Score->setValue(ui->Team2Score->value());
-    ui->Team1RegionCombo->setCurrentIndex(ui->Team2RegionCombo->currentIndex());
     alphaName->saveInFile(importDir, ui->Team1NameEdit);
-    alphaLogo->init(importDir, ui->Team1Logo, betaDir, "/" + ui->Team1NameEdit->text(), defaultDir, alphaDir);
+    alphaLogo->init(importDir, ui->Team1Logo, bravoDir, "/" + ui->Team1NameEdit->text(), defaultDir, alphaDir);
     alphaScore->saveInFile(importDir, ui->Team1Score);
-    alphaRegion->saveInFile(importDir, ui->Team1RegionCombo, "no image", regionsDir);
     this->teamAlphaOptionalFiles = this->saveOptionalFiles(alphaDir + "/" + ui->Team1NameEdit->text() + "/", importDir + "/teamAlpha/");
-    // Beta = Aux
-    this->teamBravoOptionalFiles = this->clearOptionalFiles(this->teamBravoOptionalFiles, importDir + "/teamBeta/");
+    // Bravo = Aux
+    this->teamBravoOptionalFiles = this->clearOptionalFiles(this->teamBravoOptionalFiles, importDir + "/teamBravo/");
     ui->Team2NameEdit->setText(auxName);
     ui->Team2Score->setValue(auxScore);
-    ui->Team2RegionCombo->setCurrentIndex(auxRegion);
-    betaName->saveInFile(importDir, ui->Team2NameEdit);
-    betaLogo->init(importDir, ui->Team2Logo, alphaDir, "/" + ui->Team2NameEdit->text(), defaultDir, betaDir);
-    betaScore->saveInFile(importDir, ui->Team2Score);
-    betaRegion->saveInFile(importDir, ui->Team2RegionCombo, "no image", regionsDir);
-    this->teamBravoOptionalFiles = this->saveOptionalFiles(alphaDir + "/" + ui->Team2NameEdit->text() + "/", importDir + "/teamBeta/");
+    bravoName->saveInFile(importDir, ui->Team2NameEdit);
+    bravoLogo->init(importDir, ui->Team2Logo, alphaDir, "/" + ui->Team2NameEdit->text(), defaultDir, bravoDir);
+    bravoScore->saveInFile(importDir, ui->Team2Score);
+    this->teamBravoOptionalFiles = this->saveOptionalFiles(alphaDir + "/" + ui->Team2NameEdit->text() + "/", importDir + "/teamBravo/");
     // Save file with both team names
     QString teamNames = ui->Team1NameEdit->text() + " - " + ui->Team2NameEdit->text();
     alphaName->saveInFile(importDir, ui->Team1NameEdit, "/round/", "teamNames.txt", teamNames);
@@ -1551,117 +1828,291 @@ void MainWindow::on_SwapTeamsButton_clicked()
     bool aux7 = ui->AlphaWinGame7->isChecked();
     bool aux8 = ui->AlphaWinGame8->isChecked();
     bool aux9 = ui->AlphaWinGame9->isChecked();
-    // Alpha = Beta
-    ui->AlphaWinGame1->setChecked(ui->BetaWinGame1->isChecked());
-    ui->AlphaWinGame2->setChecked(ui->BetaWinGame2->isChecked());
-    ui->AlphaWinGame3->setChecked(ui->BetaWinGame3->isChecked());
-    ui->AlphaWinGame4->setChecked(ui->BetaWinGame4->isChecked());
-    ui->AlphaWinGame5->setChecked(ui->BetaWinGame5->isChecked());
-    ui->AlphaWinGame6->setChecked(ui->BetaWinGame6->isChecked());
-    ui->AlphaWinGame7->setChecked(ui->BetaWinGame7->isChecked());
-    ui->AlphaWinGame8->setChecked(ui->BetaWinGame8->isChecked());
-    ui->AlphaWinGame9->setChecked(ui->BetaWinGame9->isChecked());
-    // Beta = Aux
-    ui->BetaWinGame1->setChecked(aux1);
-    ui->BetaWinGame2->setChecked(aux2);
-    ui->BetaWinGame3->setChecked(aux3);
-    ui->BetaWinGame4->setChecked(aux4);
-    ui->BetaWinGame5->setChecked(aux5);
-    ui->BetaWinGame6->setChecked(aux6);
-    ui->BetaWinGame7->setChecked(aux7);
-    ui->BetaWinGame8->setChecked(aux8);
-    ui->BetaWinGame9->setChecked(aux9);
+    // Alpha = Bravo
+    ui->AlphaWinGame1->setChecked(ui->BravoWinGame1->isChecked());
+    ui->AlphaWinGame2->setChecked(ui->BravoWinGame2->isChecked());
+    ui->AlphaWinGame3->setChecked(ui->BravoWinGame3->isChecked());
+    ui->AlphaWinGame4->setChecked(ui->BravoWinGame4->isChecked());
+    ui->AlphaWinGame5->setChecked(ui->BravoWinGame5->isChecked());
+    ui->AlphaWinGame6->setChecked(ui->BravoWinGame6->isChecked());
+    ui->AlphaWinGame7->setChecked(ui->BravoWinGame7->isChecked());
+    ui->AlphaWinGame8->setChecked(ui->BravoWinGame8->isChecked());
+    ui->AlphaWinGame9->setChecked(ui->BravoWinGame9->isChecked());
+    // Bravo = Aux
+    ui->BravoWinGame1->setChecked(aux1);
+    ui->BravoWinGame2->setChecked(aux2);
+    ui->BravoWinGame3->setChecked(aux3);
+    ui->BravoWinGame4->setChecked(aux4);
+    ui->BravoWinGame5->setChecked(aux5);
+    ui->BravoWinGame6->setChecked(aux6);
+    ui->BravoWinGame7->setChecked(aux7);
+    ui->BravoWinGame8->setChecked(aux8);
+    ui->BravoWinGame9->setChecked(aux9);
 }
 
-void MainWindow::closeEvent(QCloseEvent *event)
+//void MainWindow::on_actionInfoAndCasters_toggled(bool arg1)
+//{
+//    if (arg1) {
+//        ui->InfoGroupbox->show();
+//        ui->CastersGroupbox->show();
+//        QApplication::processEvents();
+//        this->adjustSize();
+//    } else {
+//        ui->InfoGroupbox->hide();
+//        ui->CastersGroupbox->hide();
+//        QApplication::processEvents();
+//        this->adjustSize();
+//    }
+//}
+
+void MainWindow::updateWeapon()
 {
-    // Making sure the winner importing files exist
+    QObject *wid = QObject::sender();
+    LineEditWidget *weapon {dynamic_cast<LineEditWidget *>(this->widgetFor[wid->objectName()])};
+    LabelWidget *label {dynamic_cast<LabelWidget *>(this->widgetFor[wid->objectName()])};
     QString importDir = this->directoryFor["/ImportingFilesDirectory.txt"];
-    QFile filename;
-    QCheckBox *alphaWins[9] = {
-        ui->AlphaWinGame1, ui->AlphaWinGame2, ui->AlphaWinGame3,
-        ui->AlphaWinGame4, ui->AlphaWinGame5, ui->AlphaWinGame6,
-        ui->AlphaWinGame7, ui->AlphaWinGame8, ui->AlphaWinGame9
-    };
-    QCheckBox *betaWins[9] = {
-        ui->BetaWinGame1, ui->BetaWinGame2, ui->BetaWinGame3,
-        ui->BetaWinGame4, ui->BetaWinGame5, ui->BetaWinGame6,
-        ui->BetaWinGame7, ui->BetaWinGame8, ui->BetaWinGame9
-    };
-    for (int i = 1; i <= 9; ++i) {
-        if (!alphaWins[i - 1]->isChecked() && !betaWins[i - 1]->isChecked()) {
-            filename.setFileName(importDir + "/set/winners/" + QString::number(i));
-            filename.open(QFile::WriteOnly);
-            filename.close();
-            filename.setFileName(importDir + "/set/winners/" + QString::number(i) + ".txt");
-            filename.open(QFile::WriteOnly);
-            filename.close();
+    QString defaultDir = this->directoryFor["/DefaultDirectory.txt"];
+    QString weaponsDir = this->directoryFor["/WeaponsDirectory.txt"];
+    weapon->saveWithImage(importDir, dynamic_cast<QLineEdit *>(wid), weaponsDir, defaultDir + "/weapons/");
+    QLineEdit *weap = (QLineEdit *)wid;
+    if (weap->text().isEmpty()) {
+        int seq = wid->objectName().right(1).toInt();
+        if (seq > 4) seq -= 4;
+        ui->TeamsTabs->findChild<QLabel *>("WeaponLabel" + wid->objectName().right(4))->setText(QString::number(seq));
+        return;
+    }
+    label->keepAspectInLabel(weaponsDir + "/" + dynamic_cast<QLineEdit *>(wid)->text(), this->labelFor[wid->objectName()]);
+}
+
+void MainWindow::labelClicked()
+{
+    QObject *wid = QObject::sender();
+    QString round = wid->objectName().right(1);
+    QString type = wid->objectName().left(6);
+    QString team = wid->objectName().left(11).right(5);
+    QString prevRound = QString::number(round.toInt() - 1);
+    if (round == "1") prevRound = "1";
+    QString label = type + "sR" + round + "_";
+    QString content;
+    int offset = 0;
+    if (team == "Bravo") offset += 4;
+    if (type == "Weapon") {
+        QLineEdit *prev1;
+        QLineEdit *current1;
+        QLineEdit *prev2;
+        QLineEdit *current2;
+        QLineEdit *prev3;
+        QLineEdit *current3;
+        QLineEdit *prev4;
+        QLineEdit *current4;
+        current1 = ui->TeamsTabs->findChild<QLineEdit *>(label + QString::number(1 + offset));
+        current2 = ui->TeamsTabs->findChild<QLineEdit *>(label + QString::number(2 + offset));
+        current3 = ui->TeamsTabs->findChild<QLineEdit *>(label + QString::number(3 + offset));
+        current4 = ui->TeamsTabs->findChild<QLineEdit *>(label + QString::number(4 + offset));
+        content = current1->text() + current2->text() + current3->text() + current4->text();
+        if (!content.isEmpty()) {
+            current1->clear();
+            current2->clear();
+            current3->clear();
+            current4->clear();
+        } else {
+            prev1 = ui->TeamsTabs->findChild<QLineEdit *>(type + "sR" + prevRound + "_" + QString::number(1 + offset));
+            prev2 = ui->TeamsTabs->findChild<QLineEdit *>(type + "sR" + prevRound + "_" + QString::number(2 + offset));
+            prev3 = ui->TeamsTabs->findChild<QLineEdit *>(type + "sR" + prevRound + "_" + QString::number(3 + offset));
+            prev4 = ui->TeamsTabs->findChild<QLineEdit *>(type + "sR" + prevRound + "_" + QString::number(4 + offset));
+            current1->setText(prev1->text());
+            current2->setText(prev2->text());
+            current3->setText(prev3->text());
+            current4->setText(prev4->text());
+        }
+        emit current1->editingFinished();
+        emit current2->editingFinished();
+        emit current3->editingFinished();
+        emit current4->editingFinished();
+    } else {
+        QComboBox *prev1;
+        QComboBox *current1;
+        QComboBox *prev2;
+        QComboBox *current2;
+        QComboBox *prev3;
+        QComboBox *current3;
+        QComboBox *prev4;
+        QComboBox *current4;
+        current1 = ui->TeamsTabs->findChild<QComboBox *>(label + QString::number(1 + offset));
+        current2 = ui->TeamsTabs->findChild<QComboBox *>(label + QString::number(2 + offset));
+        current3 = ui->TeamsTabs->findChild<QComboBox *>(label + QString::number(3 + offset));
+        current4 = ui->TeamsTabs->findChild<QComboBox *>(label + QString::number(4 + offset));
+        content = current1->currentText() + current2->currentText() + current3->currentText() + current4->currentText();
+        if (!content.isEmpty()) {
+            current1->setCurrentText("");
+            emit current1->activated(current1->currentIndex());
+            current2->setCurrentText("");
+            emit current2->activated(current2->currentIndex());
+            current3->setCurrentText("");
+            emit current3->activated(current3->currentIndex());
+            current4->setCurrentText("");
+            emit current4->activated(current4->currentIndex());
+        } else {
+            if (prevRound == "1" && round == "1") {
+                this->fillFirstPlayers(team);
+                return;
+            }
+            prev1 = ui->TeamsTabs->findChild<QComboBox *>(type + "sR" + prevRound + "_" + QString::number(1 + offset));
+            prev2 = ui->TeamsTabs->findChild<QComboBox *>(type + "sR" + prevRound + "_" + QString::number(2 + offset));
+            prev3 = ui->TeamsTabs->findChild<QComboBox *>(type + "sR" + prevRound + "_" + QString::number(3 + offset));
+            prev4 = ui->TeamsTabs->findChild<QComboBox *>(type + "sR" + prevRound + "_" + QString::number(4 + offset));
+            current1->setCurrentText(prev1->currentText());
+            current2->setCurrentText(prev2->currentText());
+            current3->setCurrentText(prev3->currentText());
+            current4->setCurrentText(prev4->currentText());
+        }
+        emit current1->activated(current1->currentIndex());
+        emit current2->activated(current2->currentIndex());
+        emit current3->activated(current3->currentIndex());
+        emit current4->activated(current4->currentIndex());
+    }
+}
+
+void MainWindow::resetFields(){
+    QString team = QObject::sender()->objectName().right(5);
+    QString type = QObject::sender()->objectName().left(7);
+    QLineEdit *field;
+    QComboBox *combo;
+    int offset = 0;
+    if (team == "Bravo") offset += 4;
+    if (type == "Weapons") {
+        for (int i = 1 + offset; i < 5 + offset; ++i) {
+            field = ui->TeamsTabs->findChild<QLineEdit *>(type + "R" + "1" + "_" + QString::number(i));
+            field->clear();
+            emit field->editingFinished();
+            field = ui->TeamsTabs->findChild<QLineEdit *>(type + "R" + "2" + "_" + QString::number(i));
+            field->clear();
+            emit field->editingFinished();
+            field = ui->TeamsTabs->findChild<QLineEdit *>(type + "R" + "3" + "_" + QString::number(i));
+            field->clear();
+            emit field->editingFinished();
+            field = ui->TeamsTabs->findChild<QLineEdit *>(type + "R" + "4" + "_" + QString::number(i));
+            field->clear();
+            emit field->editingFinished();
+            field = ui->TeamsTabs->findChild<QLineEdit *>(type + "R" + "5" + "_" + QString::number(i));
+            field->clear();
+            emit field->editingFinished();
+            field = ui->TeamsTabs->findChild<QLineEdit *>(type + "R" + "6" + "_" + QString::number(i));
+            field->clear();
+            emit field->editingFinished();
+            field = ui->TeamsTabs->findChild<QLineEdit *>(type + "R" + "7" + "_" + QString::number(i));
+            field->clear();
+            emit field->editingFinished();
+            field = ui->TeamsTabs->findChild<QLineEdit *>(type + "R" + "8" + "_" + QString::number(i));
+            field->clear();
+            emit field->editingFinished();
+            field = ui->TeamsTabs->findChild<QLineEdit *>(type + "R" + "9" + "_" + QString::number(i));
+            field->clear();
+            emit field->editingFinished();
+        }
+    } else {
+        for (int i = 1 + offset; i < 5 + offset; ++i) {
+            combo = ui->TeamsTabs->findChild<QComboBox *>(type + "R" + "1" + "_" + QString::number(i));
+            combo->setCurrentIndex(0);
+            emit combo->activated(0);
+            combo = ui->TeamsTabs->findChild<QComboBox *>(type + "R" + "2" + "_" + QString::number(i));
+            combo->setCurrentIndex(0);
+            emit combo->activated(combo->currentIndex());
+            combo = ui->TeamsTabs->findChild<QComboBox *>(type + "R" + "3" + "_" + QString::number(i));
+            combo->setCurrentIndex(0);
+            emit combo->activated(combo->currentIndex());
+            combo = ui->TeamsTabs->findChild<QComboBox *>(type + "R" + "4" + "_" + QString::number(i));
+            combo->setCurrentIndex(0);
+            emit combo->activated(combo->currentIndex());
+            combo = ui->TeamsTabs->findChild<QComboBox *>(type + "R" + "5" + "_" + QString::number(i));
+            combo->setCurrentIndex(0);
+            emit combo->activated(combo->currentIndex());
+            combo = ui->TeamsTabs->findChild<QComboBox *>(type + "R" + "6" + "_" + QString::number(i));
+            combo->setCurrentIndex(0);
+            emit combo->activated(combo->currentIndex());
+            combo = ui->TeamsTabs->findChild<QComboBox *>(type + "R" + "7" + "_" + QString::number(i));
+            combo->setCurrentIndex(0);
+            emit combo->activated(combo->currentIndex());
+            combo = ui->TeamsTabs->findChild<QComboBox *>(type + "R" + "8" + "_" + QString::number(i));
+            combo->setCurrentIndex(0);
+            emit combo->activated(combo->currentIndex());
+            combo = ui->TeamsTabs->findChild<QComboBox *>(type + "R" + "9" + "_" + QString::number(i));
+            combo->setCurrentIndex(0);
+            emit combo->activated(0);
         }
     }
 }
 
-void MainWindow::showSections_init()
+void MainWindow::roundLabelHovered()
 {
-    ui->actionSet->setChecked(true);
-    ui->actionRound->setChecked(true);
-    ui->actionTeams->setChecked(true);
-    ui->actionInfoAndCasters->setChecked(true);
+    QLabel *label = (QLabel *)QObject::sender();
+    label->setText("teste");
 }
 
-void MainWindow::on_actionSet_toggled(bool arg1)
+void MainWindow::updatePlayer()
 {
-    if (arg1) {
-        ui->SetGroupBox->show();
-        QApplication::processEvents();
-        this->adjustSize();
-    } else {
-        ui->SetGroupBox->hide();
-        QApplication::processEvents();
-        this->adjustSize();
+    QObject *wid = QObject::sender();
+    ComboBoxWidget *player {dynamic_cast<ComboBoxWidget *>(this->playerWidgetFor[wid->objectName()])};
+    player->saveContentInFile(this->directoryFor["/ImportingFilesDirectory.txt"], (QComboBox *)wid);
+}
+
+void MainWindow::updatePlayersFromAlpha()
+{
+    QComboBox *playerWidgets[36] = {
+        ui->PlayersR1_1, ui->PlayersR1_2, ui->PlayersR1_3, ui->PlayersR1_4,
+        ui->PlayersR2_1, ui->PlayersR2_2, ui->PlayersR2_3, ui->PlayersR2_4,
+        ui->PlayersR3_1, ui->PlayersR3_2, ui->PlayersR3_3, ui->PlayersR3_4,
+        ui->PlayersR4_1, ui->PlayersR4_2, ui->PlayersR4_3, ui->PlayersR4_4,
+        ui->PlayersR5_1, ui->PlayersR5_2, ui->PlayersR5_3, ui->PlayersR5_4,
+        ui->PlayersR6_1, ui->PlayersR6_2, ui->PlayersR6_3, ui->PlayersR6_4,
+        ui->PlayersR7_1, ui->PlayersR7_2, ui->PlayersR7_3, ui->PlayersR7_4,
+        ui->PlayersR8_1, ui->PlayersR8_2, ui->PlayersR8_3, ui->PlayersR8_4,
+        ui->PlayersR9_1, ui->PlayersR9_2, ui->PlayersR9_3, ui->PlayersR9_4
+    };
+    for (int i = 0; i < 36; ++i) {
+        playerWidgets[i]->clear();
+        ComboBoxWidget *player {dynamic_cast<ComboBoxWidget *>(this->playerWidgetFor[playerWidgets[i]->objectName()])};
+        player->initPlayers(this->directoryFor["/ImportingFilesDirectory.txt"], playerWidgets[i]);
     }
 }
 
-void MainWindow::on_actionRound_toggled(bool arg1)
+void MainWindow::updatePlayersFromBravo()
 {
-    if (arg1) {
-        ui->Round_Group_Box->show();
-        QApplication::processEvents();
-        this->adjustSize();
-    } else {
-        ui->Round_Group_Box->hide();
-        QApplication::processEvents();
-        this->adjustSize();
+    QComboBox *playerWidgets[36] = {
+        ui->PlayersR1_5, ui->PlayersR1_6, ui->PlayersR1_7, ui->PlayersR1_8,
+        ui->PlayersR2_5, ui->PlayersR2_6, ui->PlayersR2_7, ui->PlayersR2_8,
+        ui->PlayersR3_5, ui->PlayersR3_6, ui->PlayersR3_7, ui->PlayersR3_8,
+        ui->PlayersR4_5, ui->PlayersR4_6, ui->PlayersR4_7, ui->PlayersR4_8,
+        ui->PlayersR5_5, ui->PlayersR5_6, ui->PlayersR5_7, ui->PlayersR5_8,
+        ui->PlayersR6_5, ui->PlayersR6_6, ui->PlayersR6_7, ui->PlayersR6_8,
+        ui->PlayersR7_5, ui->PlayersR7_6, ui->PlayersR7_7, ui->PlayersR7_8,
+        ui->PlayersR8_5, ui->PlayersR8_6, ui->PlayersR8_7, ui->PlayersR8_8,
+        ui->PlayersR9_5, ui->PlayersR9_6, ui->PlayersR9_7, ui->PlayersR9_8
+    };
+    for (int i = 0; i < 36; ++i) {
+        playerWidgets[i]->clear();
+        ComboBoxWidget *player {dynamic_cast<ComboBoxWidget *>(this->playerWidgetFor[playerWidgets[i]->objectName()])};
+        player->initPlayers(this->directoryFor["/ImportingFilesDirectory.txt"], playerWidgets[i]);
     }
 }
 
-void MainWindow::on_actionTeams_toggled(bool arg1)
-{
-    if (arg1) {
-        ui->TeamAlphaGroupBox->show();
-        ui->TeamBetaGroupBox->show();
-        QApplication::processEvents();
-        this->adjustSize();
+void MainWindow::fillFirstPlayers(QString team) {
+    QComboBox *playerWidgets[4];
+    if (team == "Alpha") {
+        playerWidgets[0] = ui->PlayersR1_1;
+        playerWidgets[1] = ui->PlayersR1_2;
+        playerWidgets[2] = ui->PlayersR1_3;
+        playerWidgets[3] = ui->PlayersR1_4;
     } else {
-        ui->TeamAlphaGroupBox->hide();
-        ui->TeamBetaGroupBox->hide();
-        QApplication::processEvents();
-        this->adjustSize();
+        playerWidgets[0] = ui->PlayersR1_5;
+        playerWidgets[1] = ui->PlayersR1_6;
+        playerWidgets[2] = ui->PlayersR1_7;
+        playerWidgets[3] = ui->PlayersR1_8;
+    }
+    for (int i = 1; i < 5; ++i) {
+        if (i < playerWidgets[i - 1]->count()) {
+            playerWidgets[i - 1]->setCurrentIndex(i);
+            emit playerWidgets[i - 1]->activated(i);
+        }
     }
 }
-
-
-void MainWindow::on_actionInfoAndCasters_toggled(bool arg1)
-{
-    if (arg1) {
-        ui->InfoGroupbox->show();
-        ui->CastersGroupbox->show();
-        QApplication::processEvents();
-        this->adjustSize();
-    } else {
-        ui->InfoGroupbox->hide();
-        ui->CastersGroupbox->hide();
-        QApplication::processEvents();
-        this->adjustSize();
-    }
-}
-

@@ -25,8 +25,9 @@ public:
     void init(QString importingDir, QWidget *wid, QString logosDir);
     void init(QString importingDir, QWidget *wid, QStringList list);
     void init(QString importingDir, QWidget *wid, QStringList list, QString filename);
+    void initPlayers(QString importingDir, QWidget *wid);
     bool handleColorFile(QString colorFile, QString savingFile, QLabel *logo, bool &showedInAssistant, bool mirrored);
-    void saveColors(QString importingDir, QWidget *wid, QString local, QLabel *alphaLabel, QLabel *betaLabel, QLabel *comboLabel, bool mirrored = false);
+    void saveColors(QString importingDir, QWidget *wid, QString local, QLabel *alphaLabel, QLabel *bravoLabel, QLabel *comboLabel, bool mirrored = false);
     bool saveColor(QString colorDir, QString color,QString dirToSave, QString fileToSave, QLabel *logo, bool mirrored = false);
     QStringList getListOf(QString dirString);
 };

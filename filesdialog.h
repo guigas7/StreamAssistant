@@ -25,8 +25,7 @@ public:
 
 private slots:
     void on_AlphaTeamDirectoryHelp_clicked();
-    void on_BetaTeamDirectoryHelp_clicked();
-    void on_RegionsDirectoryHelp_clicked();
+    void on_BravoTeamDirectoryHelp_clicked();
     void on_LogosDirectoryHelp_clicked();
     void on_MapsDirectoryHelp_clicked();
     void on_ModeIconsDirectoryHelp_clicked();
@@ -36,9 +35,9 @@ private slots:
     void on_ImportingFilesDirectoryHelp_clicked();
     void on_DefaultDirectoryHelp_clicked();
     void on_WinPointsDirectoryHelp_clicked();
+    void on_WeaponsDirectoryHelp_clicked();
     void on_AlphaTeamDirectoryFind_clicked();
-    void on_BetaTeamDirectoryFind_clicked();
-    void on_RegionsDirectoryFind_clicked();
+    void on_BravoTeamDirectoryFind_clicked();
     void on_LogosDirectoryFind_clicked();
     void on_MapsDirectoryFind_clicked();
     void on_ModeIconsDirectoryFind_clicked();
@@ -48,6 +47,7 @@ private slots:
     void on_ImportingFilesDirectoryFind_clicked();
     void on_DefaultDirectoryFind_clicked();
     void on_WinPointsDirectoryFind_clicked();
+    void on_WeaponsDirectoryFind_clicked();
     void on_DirectoriesDialogButtonBox_accepted();
 
 private:

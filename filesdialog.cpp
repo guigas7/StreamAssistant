@@ -25,10 +25,8 @@ void FilesDialog::makeDefaultDir(QLineEdit *field, QString configFile, QString c
     QStringList subDirList;
     if (configFile.compare("/AlphaTeamDirectory.txt") == 0) {
         dirName = configDir + "/TeamsDirectory";
-    } else if (configFile.compare("/BetaTeamDirectory.txt") == 0) {
+    } else if (configFile.compare("/BravoTeamDirectory.txt") == 0) {
         dirName = configDir + "/TeamsDirectory";
-    } else if (configFile.compare("/RegionsDirectory.txt") == 0) {
-        dirName = configDir + "/RegionsDirectory";
     } else if (configFile.compare("/LogosDirectory.txt") == 0) {
         dirName = configDir + "/LogosDirectory";
     } else if (configFile.compare("/MapsDirectory.txt") == 0) {
@@ -38,27 +36,30 @@ void FilesDialog::makeDefaultDir(QLineEdit *field, QString configFile, QString c
     } else if (configFile.compare("/SplatfestColorsDirectory.txt") == 0) {
         dirName = configDir + "/Colors/SplatfestColorsDirectory";
         QDir().mkdir(configDir + "/Colors");
-        subDirList << dirName + "/alpha" << dirName + "/beta" << dirName + "/combo";
+        subDirList << dirName + "/alpha" << dirName + "/bravo" << dirName + "/combo";
     } else if (configFile.compare("/RankedColorsDirectory.txt") == 0) {
         dirName = configDir + "/Colors/RankedColorsDirectory";
         QDir().mkdir(configDir + "/Colors");
-        subDirList << dirName + "/alpha" << dirName + "/beta" << dirName + "/combo";
+        subDirList << dirName + "/alpha" << dirName + "/bravo" << dirName + "/combo";
     } else if (configFile.compare("/TurfWarColorsDirectory.txt") == 0) {
         dirName = configDir + "/Colors/Turf WarColorsDirectory";
         QDir().mkdir(configDir + "/Colors");
-        subDirList << dirName + "/alpha" << dirName + "/beta" << dirName + "/combo";
+        subDirList << dirName + "/alpha" << dirName + "/bravo" << dirName + "/combo";
     } else if (configFile.compare("/ImportingFilesDirectory.txt") == 0) {
         dirName = configDir + "/ImportingFilesDirectory";
         subDirList << dirName + "/casters" << dirName + "/info" << dirName + "/round";
-        subDirList << dirName + "/set" << dirName + "/teamAlpha" << dirName + "/teamBeta";
+        subDirList << dirName + "/set" << dirName + "/teamAlpha" << dirName + "/teamBravo";
         subDirList << dirName + "/set/maps" << dirName + "/set/modes";
         subDirList << dirName + "/set/winners" << dirName + "/set/winPoints";
+        subDirList << dirName + "/set/weapons" << dirName + "/set/winPoints";
     } else if (configFile.compare("/DefaultDirectory.txt") == 0) {
         dirName = configDir + "/DefaultDirectory";
         subDirList << dirName + "/logo";
     } else if (configFile.compare("/WinPointsDirectory.txt") == 0) {
         dirName = configDir + "/WinPointsDirectory";
-        subDirList << dirName + "/teamAlpha" << dirName + "/teamBeta";
+        subDirList << dirName + "/teamAlpha" << dirName + "/teamBravo";
+    } else if (configFile.compare("/WeaponsDirectory.txt") == 0) {
+        dirName = configDir + "/WeaponsDirectory";
     }
     field->setText(dirName);
     QDir().mkdir(dirName); // Make sure default dir exists
@@ -73,9 +74,10 @@ void FilesDialog::directories_init(QString *dirs)
     // put content from config files on lineEdits
     // Initialize fields and directories
     QLineEdit *widgets[dirAmount] {
-        ui->AlphaTeamDirectoryEdit, ui->BetaTeamDirectoryEdit, ui->RegionsDirectoryEdit, ui->LogosDirectoryEdit,
+        ui->AlphaTeamDirectoryEdit, ui->BravoTeamDirectoryEdit, ui->LogosDirectoryEdit,
         ui->MapsDirectoryEdit, ui->ModeIconsDirectoryEdit, ui->SplatfestColorsDirectoryEdit, ui->TurfWarColorsDirectoryEdit,
-        ui->RankedColorsDirectoryEdit, ui->ImportingFilesDirectoryEdit, ui->DefaultDirectoryEdit, ui->WinPointsDirectoryEdit
+        ui->RankedColorsDirectoryEdit, ui->ImportingFilesDirectoryEdit, ui->DefaultDirectoryEdit, ui->WinPointsDirectoryEdit,
+        ui->WeaponsDirectoryEdit
     };
     for (int i = 0; i < dirAmount; i++) {
         this->fields[i] = widgets[i];
@@ -85,7 +87,6 @@ void FilesDialog::directories_init(QString *dirs)
     QString directory = QCoreApplication::applicationDirPath() + "/config";
     QString filename;
     QString dirname;
-    int pos;
     QString text;
     bool makeDefault = false;
     // for each field
@@ -101,7 +102,6 @@ void FilesDialog::directories_init(QString *dirs)
             text = in.readAll();
             // Unless the file points to an invalid directory
             if (!QDir(text).exists()) {
-                //  qDebug() << "Invalid Directory: " + text;
                 makeDefault = true;
             // Set the file content as the config directory
             } else {
@@ -150,58 +150,53 @@ void FilesDialog::on_DirectoriesDialogButtonBox_accepted()
     QDir().mkdir(dirname + "/round");
     QDir().mkdir(dirname + "/set");
     QDir().mkdir(dirname + "/teamAlpha");
-    QDir().mkdir(dirname + "/teamBeta");
+    QDir().mkdir(dirname + "/teamBravo");
     emit allDone();
 }
 
 void FilesDialog::on_AlphaTeamDirectoryHelp_clicked()
 {
-    QMessageBox::information(this, "Alpha Team Directory", "This Directory will contain the list of teams you will can use for the Alpha Team.\n\nTo add a team, put in this directory an image file of the team logo.\n\nThe team name will be shown as the image file's name (excluding extension [.png/.jpg/etc])");
+    QMessageBox::information(this, "Alpha Team Directory", "This Directory will contain the list of teams you will can use for the Alpha Team.\n\nTo add a team, put in this directory an image file of the team logo.\n\nThe team name will be shown as the image file's name (excluding extension [.png / .jpg / .jpeg / .gif])");
 }
 
-void FilesDialog::on_BetaTeamDirectoryHelp_clicked()
+void FilesDialog::on_BravoTeamDirectoryHelp_clicked()
 {
-    QMessageBox::information(this, "Beta Team Directory", "This Directory will contain the list of teams you will can use for the Beta Team.\n\nYou probably want it to be the same as the Alpha Team directory!\n\nTo add a team, put in this directory an image file of the team logo.\n\nThe team name will be shown as the image file's name (excluding extension [.png/.jpg/etc])");
-}
-
-void FilesDialog::on_RegionsDirectoryHelp_clicked()
-{
-    QMessageBox::information(this, "Regions Directory", "This Directory will contain the regions.\n\nTo add a region, put in this directory an image file of the region.\n\nThe region name will be shown as the image file's name (excluding extension [.png/.jpg/etc])");
+    QMessageBox::information(this, "Bravo Team Directory", "This Directory will contain the list of teams you will can use for the Bravo Team.\n\nYou probably want it to be the same as the Alpha Team directory!\n\nTo add a team, put in this directory an image file of the team logo.\n\nThe team name will be shown as the image file's name (excluding extension [.png / .jpg / .jpeg / .gif])");
 }
 
 void FilesDialog::on_LogosDirectoryHelp_clicked()
 {
-    QMessageBox::information(this, "Logos Directory", "This Directory will contain the Logos.\n\nTo add a logo, put in this directory an image file of the logo.\n\nThe logo name will be shown as the image file's name (excluding extension [.png/.jpg/etc])");
+    QMessageBox::information(this, "Logos Directory", "This Directory will contain the Logos.\n\nTo add a logo, put in this directory an image file of the logo.\n\nThe logo name will be shown as the image file's name (excluding extension [.png / .jpg / .jpeg / .gif])");
 }
 
 void FilesDialog::on_MapsDirectoryHelp_clicked()
 {
-    QMessageBox::information(this, "Maps Directory", "This Directory will contain the maps.\n\nTo add a map, put in this directory an image file of the map.\n\nThe map name will be shown as the image file's name (excluding extension [.png/.jpg/etc])");
+    QMessageBox::information(this, "Maps Directory", "This Directory will contain the maps.\n\nTo add a map, put in this directory an image file of the map.\n\nThe map name will be shown as the image file's name (excluding extension [.png / .jpg / .jpeg / .gif])");
 }
 
 void FilesDialog::on_ModeIconsDirectoryHelp_clicked()
 {
-    QMessageBox::information(this, "Modes Directory", "This Directory will contain the modes.\n\nTo add a mode, put in this directory an image file of the mode.\n\nThe mode name will be shown as the image file's name (excluding extension [.png/.jpg/etc])");
+    QMessageBox::information(this, "Modes Directory", "This Directory will contain the modes.\n\nTo add a mode, put in this directory an image file of the mode.\n\nThe mode name will be shown as the image file's name (excluding extension [.png / .jpg / .jpeg / .gif])");
 }
 
 void FilesDialog::on_SplatfestColorsDirectoryHelp_clicked()
 {
-    QMessageBox::information(this, "Splatfest Colors Directory", "This Directory will contain the colors for Splatfest matches.\n\nIf you use images that contain the color for both teams, puth them inside a \"combo\" subdirectory.\nEX: /combo/blueVSorange.png.\n\n If you use separate images for each team color, puth each file with the same name under the \"alpha\" and \"beta\" subdirectories.\nEX: /alpha/blueVSorange.png and /beta/blueVSorange.png\n\n If you have more than one set of images that you use (for example, square shaped ones and triangle shaped ones, for some reason), you can put them in subdirectories, with the same name as the ones in the root directory. Ex: you can have \"combo/Blue vs Green.png\", \"combo/inGame/Blue vs Green.png\" and \"combo/triangleShaped/Blue vs Green.png\" and they'll all be coppied to the importing file as \"color\", \"ingame_color\" and \"triangleShaped_color\", as long as you have color images inside the root directory.");
+    QMessageBox::information(this, "Splatfest Colors Directory", "This Directory will contain the colors for Splatfest matches.\n\nIf you use images that contain the color for both teams, puth them inside a \"combo\" subdirectory.\nEX: /combo/blueVSorange.png.\n\n If you use separate images for each team color, puth each file with the same name under the \"alpha\" and \"bravo\" subdirectories.\nEX: /alpha/blueVSorange.png and /bravo/blueVSorange.png\n\n If you have more than one set of images that you use (for example, square shaped ones and triangle shaped ones, for some reason), you can put them in subdirectories, with the same name as the ones in the root directory. Ex: you can have \"combo/Blue vs Green.png\", \"combo/inGame/Blue vs Green.png\" and \"combo/triangleShaped/Blue vs Green.png\" and they'll all be coppied to the importing file as \"color\", \"ingame_color\" and \"triangleShaped_color\", as long as you have color images inside the root directory.");
 }
 
 void FilesDialog::on_TurfWarColorsDirectoryHelp_clicked()
 {
-    QMessageBox::information(this, "Turf War Colors Directory", "This Directory will contain the colors for Turf War matches.\n\nIf you use images that contain the color for both teams, puth them inside a \"combo\" subdirectory.\nEX: /combo/blueVSorange.png.\n\n If you use separate images for each team color, puth each file with the same name under the \"alpha\" and \"beta\" subdirectories.\nEX: /alpha/blueVSorange.png and /beta/blueVSorange.png\n\n If you have more than one set of images that you use (for example, square shaped ones and triangle shaped ones, for some reason), you can put them in subdirectories, with the same name as the ones in the root directory. Ex: you can have \"combo/Blue vs Green.png\", \"combo/inGame/Blue vs Green.png\" and \"combo/triangleShaped/Blue vs Green.png\" and they'll all be coppied to the importing file as \"color\", \"ingame_color\" and \"triangleShaped_color\", as long as you have color images inside the root directory.");
+    QMessageBox::information(this, "Turf War Colors Directory", "This Directory will contain the colors for Turf War matches.\n\nIf you use images that contain the color for both teams, puth them inside a \"combo\" subdirectory.\nEX: /combo/blueVSorange.png.\n\n If you use separate images for each team color, puth each file with the same name under the \"alpha\" and \"bravo\" subdirectories.\nEX: /alpha/blueVSorange.png and /bravo/blueVSorange.png\n\n If you have more than one set of images that you use (for example, square shaped ones and triangle shaped ones, for some reason), you can put them in subdirectories, with the same name as the ones in the root directory. Ex: you can have \"combo/Blue vs Green.png\", \"combo/inGame/Blue vs Green.png\" and \"combo/triangleShaped/Blue vs Green.png\" and they'll all be coppied to the importing file as \"color\", \"ingame_color\" and \"triangleShaped_color\", as long as you have color images inside the root directory.");
 }
 
 void FilesDialog::on_RankedColorsDirectoryHelp_clicked()
 {
-    QMessageBox::information(this, "Ranked Colors Directory", "This Directory will contain the colors for Ranked modes matches.\n\nIf you use images that contain the color for both teams, puth them inside a \"combo\" subdirectory.\nEX: /combo/blueVSorange.png.\n\n If you use separate images for each team color, puth each file with the same name under the \"alpha\" and \"beta\" subdirectories.\nEX: /alpha/blueVSorange.png and /beta/blueVSorange.png\n\n If you have more than one set of images that you use (for example, square shaped ones and triangle shaped ones, for some reason), you can put them in subdirectories, with the same name as the ones in the root directory. Ex: you can have \"combo/Blue vs Green.png\", \"combo/inGame/Blue vs Green.png\" and \"combo/triangleShaped/Blue vs Green.png\" and they'll all be coppied to the importing file as \"color\", \"ingame_color\" and \"triangleShaped_color\", as long as you have color images inside the root directory.");
+    QMessageBox::information(this, "Ranked Colors Directory", "This Directory will contain the colors for Ranked modes matches.\n\nIf you use images that contain the color for both teams, puth them inside a \"combo\" subdirectory.\nEX: /combo/blueVSorange.png.\n\n If you use separate images for each team color, puth each file with the same name under the \"alpha\" and \"bravo\" subdirectories.\nEX: /alpha/blueVSorange.png and /bravo/blueVSorange.png\n\n If you have more than one set of images that you use (for example, square shaped ones and triangle shaped ones, for some reason), you can put them in subdirectories, with the same name as the ones in the root directory. Ex: you can have \"combo/Blue vs Green.png\", \"combo/inGame/Blue vs Green.png\" and \"combo/triangleShaped/Blue vs Green.png\" and they'll all be coppied to the importing file as \"color\", \"ingame_color\" and \"triangleShaped_color\", as long as you have color images inside the root directory.");
 }
 
 void FilesDialog::on_ImportingFilesDirectoryHelp_clicked()
 {
-    QMessageBox::information(this, "Importing Files Directory", "This directory will contain all files that the scoreboard uses to save your selections (maps, modes, teams, colors, info, casters... everything).\n\nDon't change the default structure of this folder, because the scoreboard will look for specific subdirectories to save the correct files.\n\n The subdirectories of this folders are: casters, info, round, set, teamAlpha and teamBeta. The files within these directories will contain your selection of each of these topics, so you'll only need to import these files to OBS / SLOBS");
+    QMessageBox::information(this, "Importing Files Directory", "This directory will contain all files that the scoreboard uses to save your selections (maps, modes, teams, colors, info, casters... everything).\n\nDon't change the default structure of this folder, because the scoreboard will look for specific subdirectories to save the correct files.\n\n The subdirectories of this folders are: casters, info, round, set, teamAlpha and teamBravo. The files within these directories will contain your selection of each of these topics, so you'll only need to import these files to OBS / SLOBS");
 }
 
 void FilesDialog::on_DefaultDirectoryHelp_clicked()
@@ -211,7 +206,12 @@ void FilesDialog::on_DefaultDirectoryHelp_clicked()
 
 void FilesDialog::on_WinPointsDirectoryHelp_clicked()
 {
-    QMessageBox::information(this, "Win Points Directory", "This Directory will contain the default images for win points that will be assigned depending on the winner of each game.\n\nYou can set as many win points you want for alpha an for beta, and they'll all be assigned on each winner on the importingDirectory/set/winpoints.");
+    QMessageBox::information(this, "Win Points Directory", "This Directory will contain the images for win points that will be assigned depending on the winner of each game.\n\nYou can set as many win points you want for alpha an for bravo, and they'll all be assigned on each winner on the importingDirectory/set/winpoints.");
+}
+
+void FilesDialog::on_WeaponsDirectoryHelp_clicked()
+{
+    QMessageBox::information(this, "Weapons Directory", "This Directory will contain the images for weapons that can be assigned to the players of each game.\n\nThe weapon name will be shown as the image file's name (excluding extension [.png / .jpg / .jpeg / .gif])");
 }
 
 void FilesDialog::on_AlphaTeamDirectoryFind_clicked()
@@ -227,29 +227,16 @@ void FilesDialog::on_AlphaTeamDirectoryFind_clicked()
     }
 }
 
-void FilesDialog::on_BetaTeamDirectoryFind_clicked()
+void FilesDialog::on_BravoTeamDirectoryFind_clicked()
 {
-    QString betaTeamDirectory = QFileDialog::getExistingDirectory(
+    QString bravoTeamDirectory = QFileDialog::getExistingDirectory(
         this,
-        tr("Open the Beta team directory"),
+        tr("Open the Bravo team directory"),
         QCoreApplication::applicationDirPath() + "/config",
         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
     );
-    if (betaTeamDirectory.length() != 0) {
-        ui->BetaTeamDirectoryEdit->setText(betaTeamDirectory);
-    }
-}
-
-void FilesDialog::on_RegionsDirectoryFind_clicked()
-{
-    QString regionsDirectory = QFileDialog::getExistingDirectory(
-        this,
-        tr("Open the region directory"),
-        QCoreApplication::applicationDirPath() + "/config",
-        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
-    );
-    if (regionsDirectory.length() != 0) {
-        ui->RegionsDirectoryEdit->setText(regionsDirectory);
+    if (bravoTeamDirectory.length() != 0) {
+        ui->BravoTeamDirectoryEdit->setText(bravoTeamDirectory);
     }
 }
 
@@ -369,5 +356,18 @@ void FilesDialog::on_WinPointsDirectoryFind_clicked()
     );
     if (winPointDirectory.length() != 0) {
         ui->DefaultDirectoryEdit->setText(winPointDirectory);
+    }
+}
+
+void FilesDialog::on_WeaponsDirectoryFind_clicked()
+{
+    QString weaponsDirectory = QFileDialog::getExistingDirectory(
+        this,
+        tr("Open the weapons directory"),
+        QCoreApplication::applicationDirPath() + "/config",
+        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
+    );
+    if (weaponsDirectory.length() != 0) {
+        ui->WeaponsDirectoryEdit->setText(weaponsDirectory);
     }
 }
