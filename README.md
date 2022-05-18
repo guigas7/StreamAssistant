@@ -2,7 +2,7 @@
 
 This is a program designed to assist streamers that want to use **dynamic data** on **OBS,** like a scoreboard, maplist or team data, but don't know / don't want to use **html** templates.
 
-You can use **your own layout images** and add **your own team logos**, **map images**, **team colors** and even **mode icons** to customize your stream. The assistant keeps track of each team's name, logo, score, color and region + maps, modes, players, weapons and winners for a round up to a BO9. You can also add messages, titles, a logo, name and other data for your casters and change it all anytime with this Stream Assistant.
+You can use **your own layout images** and add **your own team logos**, **map images**, **team colors** and even **mode icons** to customize your stream. The assistant keeps track of each team's name, logo, score, color, maps, modes, players, weapons and winners for a round up to a BO9. You can also add messages, titles, a logo, name and other data for your casters and change it all anytime with this Stream Assistant.
 
 # Getting Started
 
@@ -10,7 +10,7 @@ You can use **your own layout images** and add **your own team logos**, **map im
     - Download the program **[Splatoon.Stream.Assistant.-.publish.rar](https://github.com/guigas7/StreamAssistant/releases/download/stable/Splatoon.Stream.Assistant.-.publish.rar).**
     - If you already have an **older** version, you can download only the .exe file, put it in the same folder as the older one, replacing the executable file **[StreamAssistant.exe](https://github.com/guigas7/StreamAssistant/releases/download/stable/StreamAssistant.exe).** You’ll still need to follow the next steps to configure the data directiories.
 - Extract the .rar file and launch the aplication with the executable **StreamAssistant.exe.**
-- Click on **Settings** -> **Set Directories**. These are the folders the program will use to **find and save data.** In there you can choose **custom** directories or just save the **default** ones (which are all in the config folder). **Make sure to hit the save button**.
+- Click on **Settings** -> **Set Directories**. These are the folders the program will use to **find and save data.** In there you can choose **custom** directories or just save the **default** ones (which are all in the config folder). **Make sure to click the save button**.
 
 # Importing Files in OBS
 
@@ -32,20 +32,13 @@ The path to the importing directory (config/importingDirectory) will be reffered
 
 - color.txt, colorGroups.txt, colors*, [subfolder]_colors**, round.txt, teamNames.txt***
 
-<aside>
-💡 * colors is the optional color you can set in the combo color directory, in case you have in one image the color for both teams.
+* colors is the optional color you can set in the combo color directory, in case you have in one image the color for both teams.
 
-</aside>
 
-<aside>
-💡 ** By adding subfolders in the colors directories you can have multiple color images, and they’ll be named after the subdirectory they’re in.
+** By adding subfolders in the colors directories you can have multiple color images, and they’ll be named after the subdirectory they’re in.
 
-</aside>
 
-<aside>
-💡 *** teamNames.txt is a file that contains both team names in one line, separated by “ - “. This file is generated since OBS doesn’t allow for a text source combining 2 files.
-
-</aside>
+*** teamNames.txt is a file that contains both team names in one line, separated by “ - “. This file is generated since OBS doesn’t allow for a text source combining 2 files.
 
 ### .../set
 
@@ -67,15 +60,10 @@ The path to the importing directory (config/importingDirectory) will be reffered
 
 - color, color.txt, logo, name.txt, score.txt, region.txt, [subfolder]_color*, [customFile]**, [customFile].txt**
 
-<aside>
-💡 * By adding subfolders in the colors directories you can have multiple color images, and they’ll be named after the subdirectory they’re in.
 
-</aside>
+* By adding subfolders in the colors directories you can have multiple color images, and they’ll be named after the subdirectory they’re in.
 
-<aside>
-💡 ** You can add any amount of custom image or text files, with any name you want. It’s recommended to use the same file name in all team folders so you can import just one file in OBS to show each team data.
-
-</aside>
+** You can add any amount of custom image or text files, with any name you want. It’s recommended to use the same file name in all team folders so you can import just one file in OBS to show each team data.
 
 # Teams
 
@@ -85,12 +73,9 @@ The easiest way to add a new team is to add an image file, the image will be the
 
 If you add a folder instead of an image, the name of the folder will be the name used in the assistant’s auto complete, but you can override the team name with a text file named name.txt inside that folder. The logo of the team has to be in a file named logo.[png / jpg / jpeg / gif] inside the team’s folder.
 
-You can also have any custom text / image data in a team folder, that will be copied to the importing directory when the team is selected. For example, you can have a text file teamMembers.txt in all you teams containing the name of the players of each team, or teamBanner.[png / jpg / jpeg / gif]. You can add any text / image files with any names you want, the importing file will have the same name as the custom file in the team folder.
+You can also have any custom text / image data in a team folder, that will be copied to the importing directory when the team is selected. For example, you can have a text file teamMembers.txt in all you teams containing the name of the players of each team, or teamBanner.[png / jpg / jpeg / gif]. You can add any amount of text / image files with any names you want, the importing file will have the same name as the custom file in the team’s   folder.
 
-<aside>
 💡 It’s possible to assign different folders for team Alpha and Bravo, then you can have the same team with different data depending if they’re selected as Alpha / Bravo team. Although if you just plan to fit team’s logo in different shapes, an easier way is to just apply a mask filter in the logo source on OBS.
-
-</aside>
 
 If you input a team name that doesn’t have any folder / image matching in the teams folder, the Assistant will pick an image from the logo folder in the default directory.
 
@@ -119,7 +104,7 @@ Maps and modes from the current selected game are also saved in ...set/
 
 Similar to Maps and Modes, each game can have up to 8 players and 8 weapons (1 - 4 for Alpha, 5 - 8 for bravo). Weapons will save image and name from files in the weapons directory. The players select box will be filled from the content of files named member[1-99].txt in the selected team’s folder. You can also type in the select box so you don’t need to add the team’s players beforehand.
 
-By double clicking the label of the first game in the players tab, if all the fields from that game are empty it will fill the fields with the first players from files member1.txt to member4.txt, if they exist.
+By double clicking the label of the first game in the players tab, if all the fields from that game are empty it will fill the fields with the first players from files member1.txt to member4.txt, if they exist. 
 
 ![Players1](Guide_images/Players1.png)
 
@@ -153,10 +138,8 @@ The colors have a set order that the game follows once a lobby is opened. If you
     - ColorsDirectory/RankedColorsDirectory/alpha/BluevsGreen.png (image containing the blue color)
     - ColorsDirectory/RankedColorsDirectory/bravo/BluevsGreen.png (image containing the green color)
     - ColorsDirectory/RankedColorsDirectory/combo/BluevsGreen.png (image containing blue and green color)
-- On the alpha, bravo and combo directories, you can also have any amount os subdirectories containing other set of images, as long as they all have the same name, they'll be created and updated with the name [subfolder name]_color in the same importing folder as the main color file.
+- On the alpha, bravo and combo directories, you can also have any amount os subdirectories containing other sets of images, as long as they all have the same name, they'll be created and updated with the name [subfolder name]_color in the same importing folder as the main color file.
 - Reversing the colors will reverse the combo image vertically and horizontally. Some complicated shapes might not work very well with this feature.
-
-Feel free to add issues in here for bugfixes or asking new features. You can also DM me [@Guigas_Jr](https://twitter.com/Guigas_Jr)
 
 # Logo
 
@@ -166,10 +149,17 @@ You can use this field to select between images stored in the Logos directory.
 
 Winpoints are images that you can set for when a team has won a game. You can have different winpoints for bravo and alpha. You can also have as many winpoints as you want, they’ll be copied to the importing folder with the winpoint filename (ignoring extension).
 
-<aside>
 💡 A common use of winpoints is to put a dark image (with less than 100% opacity) over a map in the round screen, to indicate that the map has already been played out.
 
-</aside>
+# OBS Tips
+
+- You can fix a source image resolution by adding a rescaling filter on it, this way you don’t need to have all your images in the same resolution.
+- You can set a mask filter to cut an image in a fixed shape, and the image that defines the shape from that filter can also be something from the importing directory like a winPoint or a custom team image.
+- The easiest way to add an animated element in OBS is to have the content in a .mov video (.mov allows for a transparent background in a video, which is usefull for animated elements).
+- You can make your own custom transitions with stingers: [https://www.youtube.com/watch?v=wGntVBSnA8Q](https://www.youtube.com/watch?v=wGntVBSnA8Q)
+- OBS does support advanced animations with any kind of source elements you have: [https://www.youtube.com/watch?v=pnTyTRftF6g](https://www.youtube.com/watch?v=pnTyTRftF6g)
+
+OBS allows for very complex animations and there are a lot of custom features you can add with plugins
 
 # Custom Features:
 
@@ -177,9 +167,9 @@ I’m not currently working on new features, but i’m keeping track of user fee
 
 I’m not being paid to do this, so don’t expect the next release to come out anytime soon. (Unless you want to pay me 👀).
 
-### Possible next features:
+### Possible next features (tell me if you’re interested in them so i know what to focus next):
 
 - Adding custom caster data (to use with pronouns, picture or anything else).
-- Adding reversed combo colors folder (so you can configure the program to use that instead of mirroring the image, which doesn’t work well depending on the shape of your color image).
-- Vertical layout (it’s just positioning the tabs vertically, but believe me, it’s a pain in the ass to make it work with the way the program was made).
-- Saving data in json format to use the program with html / javascript overlays.
+- Adding reversed combo colors folder (so you can configure the program to use that instead of mirroring the image when reversing colors, which doesn’t work well depending on the shape of your color image).
+- Vertical layout (it’s just positioning the tabs vertically, but believe me, it’s a pain in the ass to make it work with the way the program was made, likely the hardest requested feature so far).
+- Saving data in json format to allow using the program with html / javascript overlays.
